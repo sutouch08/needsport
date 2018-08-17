@@ -1,0 +1,28 @@
+/* CSS Document */
+body{
+	background-color:#FFF;
+}
+
+.navbar-default
+{
+	background-color: #e93fcb;
+	border-color:#b10993;
+}
+.navbar-default .navbar-nav > .open > a, .navbar-default .navbar-nav > .open > a:hover, .navbar-default .navbar-nav > .open > a:focus {
+  color: white;
+  background-color: #bd2eb9;
+}
+
+.dropdown-menu {
+  background-color: #f149d3;
+  border: none;
+}
+.dropdown-menu .divider {
+	background-color: #f3edf2;
+	border-bottom: medium none;
+}
+.dropdown-menu li a:hover, .dropdown-menu li a:focus, .dropdown-menu .active a, .dropdown-menu .active a:hover, .dropdown-menu .active a:focus {
+  color: white;
+  background-color: #d327d6;
+  outline: none;
+}
