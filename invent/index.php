@@ -89,6 +89,14 @@ switch($page){
 			$content = "cancle_zone.php";
 			$pageTitle = "ตรวจสอบ CANCLE ZONE";
 			break;
+		case "stock_movement" :
+			$content = "stock_movement.php";
+			$pageTitle = "ตรวจสอบ MOVEMENT";
+			break;
+		case 'stock' :
+			$content = 'stock.php';
+			$pageTitle = 'ตรวจสอบ STOCK';
+			break;
 
 //**********  ระบบขาย  **********//
 		case "order":
@@ -668,6 +676,10 @@ switch($page){
 		case "import_stock_zone" :
 			$content = "import_stock_db.php";
 			$pageTitle = "นำเข้ายอดยกมาต้นงวด";
+			break;
+		case 'channels' :
+			$content = 'channels.php';
+			$pageTitle = 'เพิ่ม/แก้ไข ช่องทางการขาย';
 			break;
 		default:
 			$content = 'main.php';

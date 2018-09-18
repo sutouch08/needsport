@@ -11,6 +11,7 @@
 	accessDeny($view);
 	include 'function/order_helper.php';
 	include "function/address_helper.php";
+	include 'function/channels_helper.php';
 
 	//-------------  ตรวจสอบออเดอร์ที่หมดอายุทุกๆ 24 ชั่วโมง  -----------//
 	if( ! getCookie('expirationCheck') )
@@ -71,6 +72,7 @@ if(isset($_GET['add'])) :
 	$payment 			= isset($_GET['id_order']) ? $order->payment : '';
 	$onlineCustomer	= isset($_GET['id_order']) ? getCustomerOnlineReference($id_order) : '';
 	$date_add  = isset($_GET['id_order']) ? thaiDate($order->date_add) : date('d-m-Y');
+	$id_channels  = isset($_GET['id_order']) ? $order->id_channels : '';
 
 ?>
 <form id='addForm'>
@@ -103,6 +105,13 @@ if(isset($_GET['add'])) :
         <select name='payment' id='payment' class='form-control input-sm' <?php echo $active; ?> ><?php echo paymentMethod($payment); ?></select>
     </div>
     <?php endif; ?>
+		<div class="col-sm-2">
+			<label>ช่องทางขาย</label>
+			<select name="channels" id="channels" class="form-control input-sm" <?php echo $active; ?> >
+				<option value="xxx">เลือกช่องทางขาย</option>
+				<?php echo selectOfflineChannels($id_channels); ?>
+			</select>
+		</div>
 	<div class='col-sm-10'>
 		<label>หมายเหตุ</label>
     	<input type='text' id='comment' name='comment' class='form-control input-sm' value='<?php echo $comment; ?>' autocomplete='off' <?php echo $active; ?> />

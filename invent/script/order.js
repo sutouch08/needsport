@@ -468,7 +468,7 @@ function getProduct() {
         data: {
           "product_code": st,
           "id_customer": id_cus,
-          "id_order" : id_order 
+          "id_order" : id_order
         },
         success: function(dataset) {
             load_out();
@@ -576,8 +576,25 @@ function newOrder() {
     var date = $("#doc_date").val();
     var cus_name = $("#customer_name").val();
     var id_cus = $("#id_customer").val();
-    if (date == '') { swal('วันที่ไม่ถูกต้อง'); return false; }
-    if (id_cus == '' || cus_name == '') { swal('ชื่อลูกค้าไม่ถูกต้อง'); return false; }
+    var id_channels = $('#channels').val();
+
+    if (date == ''){
+      swal('วันที่ไม่ถูกต้อง');
+      return false;
+    }
+
+
+    if (id_cus == '' || cus_name == ''){
+      swal('ชื่อลูกค้าไม่ถูกต้อง');
+      return false;
+    }
+
+    if(id_channels == 'xxx'){
+      swal('กรุณาเลือกช่องทางขาย');
+      return false;
+    }
+
+
     load_in();
     $.ajax({
         url: "controller/orderController.php?addNewOrder",

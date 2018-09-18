@@ -93,11 +93,16 @@ if( isset( $_GET['closeOrder'] ) )
 	}
 	echo $sc;
 }
+
+
+
+
 //------------------------- แจ้งโอนเงินพร้อมแนบไฟล์หลักฐาน  ------------//
 if( isset( $_GET['confirmPayment'] ) )
 {
 	require "../../library/class/class.upload.php";
 	require "../function/bank_helper.php";
+
 	$sc 			= 'fail';
 	$file 			= isset( $_FILES['image'] ) ? $_FILES['image'] : FALSE;
 	$id_order 		= $_POST['id_order'];
@@ -113,22 +118,23 @@ if( isset( $_GET['confirmPayment'] ) )
 	$date_add 		= date('Y-m-d H:i:s');
 	$order			= new order($id_order);
 
-	$id_emp			= getCookie('user_id');
+	$id_emp			= isset($_POST['customer_id']) ? $_POST['customer_id'] :getCookie('user_id');
+
 	//-------  บันทึกรายการ -----//
 	$payment = isPaymentExists($id_order);
 	if( $payment === FALSE )
 	{
 		$qr = "INSERT INTO tbl_payment ( id_order, order_amount, pay_amount, paydate, id_account, acc_no, id_employee, date_add) VALUES ";
 		$qr .= "(".$id_order.", ".$orderAmount.", ".$payAmount.", '".$payDate."', ".$id_acc.", '".$accNo."', ".$id_emp.", '".$date_add."')";
-		$qs = dbQuery($qr);
 	}
 	else
 	{
+
 		$qr = "UPDATE tbl_payment SET order_amount = ".$orderAmount.", pay_amount = ".$payAmount.", paydate = '".$payDate."', ";
 		$qr .= "id_account = ".$id_acc.", acc_no = '".$accNo."', id_employee = ".$id_emp.", date_add = '".$date_add."' WHERE id_payment = ".$payment;
-		$qs = dbQuery($qr);
 	}
-	if( $qs)
+
+	if( dbQuery($qr))
 	{
 		$sc = 'success';
 	}
@@ -153,6 +159,7 @@ if( isset( $_GET['confirmPayment'] ) )
 		$image->clean();
 	}
 	echo $sc;
+
 }
 
 //------------------------  Add/ Update Online Address  ----------------------//
@@ -299,7 +306,8 @@ if( isset( $_GET['addNewOrder'] ) )
 						"comment"		=> $_POST['comment'],
 						"valid"				=> 0,
 						"role"				=> $_POST['role'],
-						"date_add"		=> $date_add
+						"date_add"		=> $date_add,
+						"id_channels" => $_POST['channels']
 						);
 	$order = new order();
 	$rs = $order->add($data);
@@ -327,6 +335,7 @@ if( isset( $_GET['updateEditOrderHeader'] ) )
 						"id_customer" 	=> $_POST['id_customer'],
 						"id_employee"	=> $_POST['id_employee'],
 						"payment"		=> $_POST['payment'],
+						"id_channels" => $_POST['channels'],
 						"comment"		=> $_POST['comment'],
 						"date_add"		=> dbDate($_POST['doc_date'], true)
 							);
@@ -364,7 +373,7 @@ if( isset( $_GET['getProductGrid'] ) )
 	if( $id_product !== FALSE )
 	{
 		$id_cus 	= $_POST['id_customer'];
-		$id_order = $_POST['id_order'];
+		$id_order = isset($_POST['id_order']) ? $_POST['id_order'] : '';
 		$product = new product();
 		$product->product_detail($id_product, $id_cus);
 		$config 	= getConfig("ATTRIBUTE_GRID_HORIZONTAL");

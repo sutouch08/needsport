@@ -1,5 +1,5 @@
 <?php
-ini_set('display_errors', 'Off');
+ini_set('display_errors', 'On');
 date_default_timezone_set('Asia/Bangkok');
 //ob_start("ob_gzhandler");
 ob_start();
@@ -9,16 +9,16 @@ error_reporting(E_ALL);
 //session_start();
 
  //database connection config
-$dbHost = '172.20.11.8';
-$dbUser = 'wrxadmin';
-$dbPass = 'W@rr1X$p0rt';
-$dbName = 'samba';
+$dbHost = 'localhost';
+$dbUser = 'root';
+$dbPass = 'warrix';
+$dbName = 'needsport';
 
 // setting up the web root, server root and company's name
 
 $thisFile = str_replace('\\', '/', __FILE__);
 $docRoot = $_SERVER['DOCUMENT_ROOT'];
-$webRoot  = str_replace(array($docRoot, 'library/config.php'), '', $thisFile); 
+$webRoot  = str_replace(array($docRoot, 'library/config.php'), '', $thisFile);
 $srvRoot  = str_replace('library/config.php', '', $thisFile);
 define('DOC_ROOT', $docRoot);
 

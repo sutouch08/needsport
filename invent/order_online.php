@@ -1,8 +1,7 @@
 <script src="<?php echo WEB_ROOT; ?>library/js/clipboard.min.js"></script>
 <?php
-	$page_name	= "ขายออนไลน์";
 	$id_tab 			= 14;
-    $pm 				= checkAccess($id_profile, $id_tab);
+  $pm 				= checkAccess($id_profile, $id_tab);
 	$view 			= $pm['view'];
 	$add 				= $pm['add'];
 	$edit 				= $pm['edit'];
@@ -10,6 +9,7 @@
 	accessDeny($view);
 	require 'function/order_helper.php';
 	require 'function/bank_helper.php';
+	include 'function/channels_helper.php';
 	//-------------  ตรวจสอบออเดอร์ที่หมดอายุทุกๆ 24 ชั่วโมง  -----------//
 	if( ! getCookie('expirationCheck') )
 	{
@@ -20,7 +20,7 @@
 ?>
 <div class="container">
 <div class="row top-row">
-	<div class="col-sm-6 top-col"><h4 class="title"><i class="fa fa-desktop"></i>&nbsp;<?php echo $page_name; ?></h4></div>
+	<div class="col-sm-6 top-col"><h4 class="title"><i class="fa fa-desktop"></i>&nbsp;<?php echo $pageTitle; ?></h4></div>
     <div class="col-sm-6">
       <p class="pull-right top-p">
 	<?php if( isset($_GET['add'] ) || isset( $_GET['edit'] ) || isset( $_GET['view_stock'] ) ) : ?>
@@ -80,6 +80,7 @@ if(isset($_GET['add'])) :
 	$comment 			= isset($_GET['id_order']) ? $order->comment : '';
 	$payment 			= isset($_GET['id_order']) ? $order->payment : '';
 	$onlineCustomer	= isset($_GET['id_order']) ? getCustomerOnlineReference($id_order) : '';
+	$id_channels  = isset($_GET['id_order']) ? $order->id_channels : '';
 
 ?>
 <form id='addForm'>
@@ -105,6 +106,13 @@ if(isset($_GET['add'])) :
         <input type="text" name="online" id="online" class="form-control input-sm" value="<?php echo $onlineCustomer; ?>" <?php echo $active; ?> />
         <input type="hidden" name="payment" id="payment" value="ออนไลน์" />
     </div>
+		<div class="col-sm-2">
+			<label>ช่องทางขาย</label>
+			<select name="channels" id="channels" class="form-control input-sm" <?php echo $active; ?> >
+				<option value="xxx">เลือกช่องทางขาย</option>
+				<?php echo selectOnlineChannels($id_channels); ?>
+			</select>
+		</div>
 	<div class='col-sm-10'>
 		<label>หมายเหตุ</label>
     	<input type='text' id='comment' name='comment' class='form-control input-sm' value='<?php echo $comment; ?>' autocomplete='off' <?php echo $active; ?> />
@@ -148,7 +156,7 @@ if(isset($_GET['add'])) :
 </div><!---/ row -->
 <hr style='border-color:#CCC; margin-top: 0px; margin-bottom:0px;' />
 <div class='row'>
-	<div class='col-sm-12'>		
+	<div class='col-sm-12'>
 		<div class='tab-content' style="min-height:1px; padding:0px;">
 		<?php echo getCategoryTab(); ?>
 		</div>
@@ -495,6 +503,9 @@ if(isset($_GET['add'])) :
 <?php 	$orderTxt .= '--------------------------------------- <br/>';	?>
 <?php		endwhile; 	?>
 <?php	endif; ?>
+<?php  $orderTxt .= 'แจ้งชำระเงิน <br/>'; ?>
+<?php  $orderTxt .= getConfig('WEB_ROOT_URL').'payment.php?id_order='.$id_order; ?>
+
 <?php	else :  ?>
 		<tr>
             <td colspan='7' align='center'><h4>ไม่มีรายการสินค้า</h4></td>

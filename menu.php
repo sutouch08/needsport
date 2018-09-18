@@ -30,6 +30,8 @@
                 <li><a href="index.php?content=drop_zero"><span class="glyphicon glyphicon-tasks"></span>&nbsp; เคลียร์ยอดสต็อกที่เป็นศูนย์</a></li>
                 <li><a href="index.php?content=buffer_zone"><span class="glyphicon glyphicon-tasks"></span>&nbsp; ตรวจสอบ BUFFER ZONE</a></li>
                 <li><a href="index.php?content=cancle_zone"><span class="glyphicon glyphicon-tasks"></span>&nbsp; ตรวจสอบ CANCLE ZONE</a></li>
+                <li><a href="index.php?content=stock_movement"><span class="glyphicon glyphicon-tasks"></span>&nbsp; ตรวจสอบ MOVEMENT</a></li>
+                <li><a href="index.php?content=stock"><span class="glyphicon glyphicon-tasks"></span>&nbsp; ตรวจสอบ STOCK</a></li>
               </ul>
 
             </li>
@@ -279,6 +281,8 @@
                     </li>
                     <li class="divider"></li>
                     <li><a href="index.php?content=supplier"><i class='fa fa-users'></i>&nbsp; เพิ่ม/แก้ไข รายชื่อผู้ขาย</a></li>
+                    <li class="divider"></li>
+                    <li><a href="index.php?content=channels"><i class='fa fa-bolt'></i>&nbsp; เพิ่ม/แก้ไข ช่องทางการขาย</a></li>
                     <li class="divider"></li>
                     <li><a href="index.php?content=sender"><i class="fa fa-truck"></i>&nbsp; เพิ่ม/แก้ไข รายชื่อผู้จัดส่ง</a></li>
                     <li><a href="index.php?content=transport"><i class="fa fa-truck"></i>&nbsp; เชื่อมโยงการจัดส่งของลูกค้า</a></li>
