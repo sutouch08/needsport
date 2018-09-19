@@ -66,6 +66,29 @@ class order{
 		}
 	}
 
+	public function getIdOrder($id_order_detail)
+	{
+		$qs = dbQuery("DELECT id_order FROM tbl_order_detail WHERE id_order_detail = ".$id_order_detail);
+		if(dbNumRows($qs) == 1)
+		{
+			$rs = dbFetchObject($qs);
+			return $rs->id_order;
+		}
+
+		return FALSE;
+	}
+
+
+	public function getDetail($id_order_detail)
+	{
+		$qs = dbQuery("SELECT * FROM tbl_order_detail WHERE id_order_detail = ".$id_order_detail);
+		if(dbNumRows($qs) == 1)
+		{
+			return dbFetchObject($qs);
+		}
+
+		return FALSE;
+	}
 
 
 	public function updateDeliveryFee($id, $amount)

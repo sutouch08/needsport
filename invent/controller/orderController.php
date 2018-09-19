@@ -588,16 +588,93 @@ if( isset( $_GET['getOrderProductTable'] ) )
 //--------------------------  Delete 1 Order detail  --------------//
 if( isset( $_GET['deleteOrderDetail'] ) )
 {
-	$sc 		= 'success';
+	$sc 		= TRUE;
 	$id			= $_POST['id_order_detail'];
 	$order	= new order();
-	$rs 		= $order->deleteOrderDetail($id);
-	if( ! $rs )
+	$buffer = new buffer();
+	$cancle = new cancle();
+	$temp   = new temp();
+	$qc     = new qc();
+
+	$od = $order->getDetail($id);
+
+	if($od !== FALSE)
 	{
-		$sc = 'fail';
+		$qs = $buffer->getDetails($od->id_order, $od->id_product_attribute);
+
+		if(dbNumRows($qs) > 0)
+		{
+			startTransection();
+
+			while($rs = dbFetchObject($qs))
+			{
+				if($sc === FALSE)
+				{
+					break;
+				}
+
+				$ds = array(
+					"id_order" => $od->id_order,
+					"id_product" => $rs->id_product,
+					"id_product_attribute" => $rs->id_product_attribute,
+					"qty" => $rs->qty,
+					"id_zone" => $rs->id_zone,
+					"id_warehouse" => $rs->id_warehouse,
+					"id_employee" => getCookie('user_id')
+				);
+
+				//--- เพิ่มข้อมูลสินค้าเข้า cancle
+				if(!$cancle->addCancle($ds))
+				{
+					$sc = FALSE;
+				}
+
+				//--- ลบข้อมูลสินค้าออกจาก buffer
+				if(!$buffer->dropBuffer($rs->id_buffer))
+				{
+					$sc = FALSE;
+				}
+
+			}	//--- end while
+
+		} //--- end if
+
+		//---  ลบข้อมูลในออเดอร์
+		if($sc === TRUE && !$order->deleteOrderDetail($id))
+		{
+			$sc = FALSE;
+		}
+
+		//--- ลบข้อมูลใน temp
+		if($sc === TRUE && !$temp->dropProductTemp($od->id_order, $od->id_product_attribute))
+		{
+			$sc = FALSE;
+		}
+
+		//---ลบข้อมูล qc
+		if($sc === TRUE && !$qc->dropQc($od->id_order, $od->id_product_attribute))
+		{
+			$sc = FALSE;
+		}
+
+		if($sc === TRUE)
+		{
+			commitTransection();
+		}
+		else
+		{
+			dbRollback();
+		}
+
+		endTransection();
+
 	}
-	echo $sc;
+
+	echo $sc === TRUE ? 'success' : 'fail';
 }
+
+
+
 
 if( isset( $_GET['getBillSummary'] ) )
 {
