@@ -489,7 +489,7 @@ echo"
 	<?php	if( dbNumRows($qs) > 0 ) : ?>
 	<?php		while( $rs = dbFetchObject($qs) ) : ?>
 	<?php			$location = $rs->order_status == 0 ? 'add' : 'edit';	?>
-	<?php			$order_state = $rs->current_state == 0 ? 'ยังไม่บันทึก' : current_order_state($rs->current_state);		?>
+	<?php			$order_state = $rs->current_state == 0 ? 'ยังไม่บันทึก' : stateLabel($rs->current_state);		?>
     				<tr style="font-size:12px; <?php echo $rs->order_status == 0 ? "" : "color:white; background-color: ".state_color($rs->current_state); ?>">
                     	<td align="center" class="pointer" onclick="goTo('<?php echo $location; ?>',<?php echo $rs->id_order; ?>)"><?php echo $rs->id_order; ?></td>
                         <td class="pointer" onclick="goTo('<?php echo $location; ?>',<?php echo $rs->id_order; ?>)"><?php echo $rs->reference; ?></td>

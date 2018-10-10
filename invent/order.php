@@ -899,9 +899,9 @@ $('#modal_approve_edit').on('shown.bs.modal', function () {  $('#edit_bill_passw
 				<td><?php echo $customer; ?></td>
                 <td><?php echo $province; ?></td>
 				<td><?php echo employee_name($order->id_employee); ?></td>
-				<td align='center'><?php echo number_format(orderAmount($id)); ?></td>
+				<td align='center'>0.00<?php //echo number_format(orderAmount($id)); ?></td>
 				<td align='center'><?php echo $order->payment; ?></td>
-				<td align='center'><?php echo $order->current_state_name; ?></td>
+				<td align='center'>หมดอายุ<?php //echo $order->current_state_name; ?></td>
 				<td align='center'><?php echo thaiDate($order->date_add); ?></td>
 				<td align='center'><?php echo thaiDate($order->date_upd); ?></td>
 			</tr>
