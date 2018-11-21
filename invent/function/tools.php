@@ -116,7 +116,7 @@ function employee_in($txt)
 //-------------------------  สร้าง cookie
 function createCookie($name, $value, $time = 3600, $path = '/')
 {
-	return setcookie($name, $value, time()+$time, $path);
+	return setcookie($name, $value, intval(time()+$time), $path);
 }
 
 
@@ -125,7 +125,7 @@ function createCookie($name, $value, $time = 3600, $path = '/')
 //----------------------------  ลบ cookie
 function deleteCookie($name, $path = '/')
 {
-	return setcookie($name, '', time()-3600, $path);
+	return setcookie($name, '', intval(time()-3600), $path);
 }
 
 
@@ -2601,7 +2601,7 @@ function update_stock_zone( $qty, $id_zone, $id_pa)
 			else
 			{
 				$qr = FALSE;
-			}			
+			}
 		}
 	}
 	else
