@@ -740,7 +740,7 @@ function validEditDiscountPermission()
 }
 function inputPassword()
 {
-	$('#discountApprove').modal('show');	
+	$('#discountApprove').modal('show');
 }
 
 $("#discountApprove").on("shown.bs.modal", function(){ $("#s_key").focus(); });
@@ -765,7 +765,7 @@ function saveEditDiscount(apv)
 				hideEditPrice();
 				hideEditDiscount();
 			}else{
-				swal("ไม่สำเร็จ", "ไม่สามารถแก้ไขข้อมูลได้ กรุณาลองใหม่อีกครั้ง", "error");	
+				swal("ไม่สำเร็จ", "ไม่สามารถแก้ไขข้อมูลได้ กรุณาลองใหม่อีกครั้ง", "error");
 			}
 		}
 	});
@@ -785,7 +785,7 @@ function editPrice(n, id)
 	var ne = parseInt(n) + 1;
 	$('.price'+n).keyup(function(e){
 		if(e.keyCode == 13 ){
-			if( $(this).val() == ''){ 
+			if( $(this).val() == ''){
 				swal('ราคาสินค้าไม่ถูกต้อง');
 				return false;
 			}
@@ -794,7 +794,7 @@ function editPrice(n, id)
 			recal();
 			$('.price'+ne).focus().select();
 		}
-	}); 
+	});
 }
 
 function editPercent(n, id)
@@ -802,7 +802,7 @@ function editPercent(n, id)
 	var ne = parseInt(n) + 1;
 	$('.percent'+n).keyup(function(e){
 		if(e.keyCode == 13 ){
-			if( $(this).val() != '' || $(this).val() != 0){ 
+			if( $(this).val() != '' || $(this).val() != 0){
 				$("#a_dis"+id).val(0);
 				$("#amountLabel"+id).text(0.0);
 			}else{
@@ -813,7 +813,7 @@ function editPercent(n, id)
 			recal();
 			$('.percent'+ne).focus().select();
 		}
-	}); 
+	});
 }
 
 function editAmount(n, id)
@@ -821,7 +821,7 @@ function editAmount(n, id)
 	var ne = parseInt(n) + 1;
 	$('.amount'+n).keyup(function(e){
 		if(e.keyCode == 13 ){
-			if( $(this).val() != '' || $(this).val() != 0){ 
+			if( $(this).val() != '' || $(this).val() != 0){
 				$("#p_dis"+id).val(0);
 				$("#percentLabel"+id).text(0.0);
 			}else{
@@ -832,7 +832,7 @@ function editAmount(n, id)
 			recal();
 			$('.amount'+ne).focus().select();
 		}
-	}); 
+	});
 }
 
 
@@ -855,14 +855,14 @@ function hideEditPrice()
 
 function showEditDiscount()
 {
-	$('.discountLabel').css('display', 'none');	
+	$('.discountLabel').css('display', 'none');
 	$('.edit-discount').css('display', '');
 	$('#btnEditDiscount').css('display', 'none');
 	$('#btnSaveDiscount').css('display', '');
 }
 function hideEditDiscount()
 {
-	$('.discountLabel').css('display', '');	
+	$('.discountLabel').css('display', '');
 	$('.edit-discount').css('display', 'none');
 	$('#btnEditDiscount').css('display', '');
 	$('#btnSaveDiscount').css('display', 'none');
@@ -1351,14 +1351,23 @@ function saveConsign(id)
 	load_in();
 	$.ajax({
 		url:"controller/consignController.php?saveConsign",
-		type:"POST", cache: "false", data:{ "id_order_consign" : id },
+		type:"POST",
+		cache: "false",
+		data:{
+			"id_order_consign" : id
+		},
 		success: function(rs){
 			load_out();
 			var rs = $.trim(rs);
 			if( rs == "success" ){
-				swal({ title: 'สำเร็จ', text: 'เปิดบิลและตัดสต็อกเรียบร้อยแล้ว', timer: 1000, type: 'success' });
+				swal({
+					title: 'สำเร็จ',
+					text: 'เปิดบิลและตัดสต็อกเรียบร้อยแล้ว', 
+					timer: 1000,
+					type: 'success'
+				});
 			}else{
-				swal("เกิดข้อผิดพลาด!!", "เปิดบิลไม่สำเร็จ กรุณาลองใหม่อีกครั้ง", "error");
+				swal("เกิดข้อผิดพลาด!!", rs, "error");
 			}
 		}
 	});

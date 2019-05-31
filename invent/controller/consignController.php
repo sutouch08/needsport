@@ -14,7 +14,7 @@ if( isset( $_GET['saveEditDiscount'] ) && isset( $_GET['id'] ) && isset( $_GET['
 	$prices 	= $_POST['productPrice'];
 	$p_disx 	= $_POST['p_dis'];
 	$a_disx 	= $_POST['a_dis'];
-	
+
 	$sc 		= true;
 	startTransection();
 	foreach($prices as $id_cd => $price)
@@ -23,7 +23,7 @@ if( isset( $_GET['saveEditDiscount'] ) && isset( $_GET['id'] ) && isset( $_GET['
 		$a_dis = $a_disx[$id_cd];
 		$ds = $cs->getConsignItemArray($id_cd);
 		$rs = $cs->updatePriceAndDiscount($id_cd, $price, $p_dis, $a_dis);
-		$rd = $cs->createDiscountLogs($ds, $id_emp, $apv, $price, $p_dis, $a_dis); 
+		$rd = $cs->createDiscountLogs($ds, $id_emp, $apv, $price, $p_dis, $a_dis);
 		if( !$rs || !$rd ){ $sc = false; }
 	}
 	if( $sc )
@@ -34,7 +34,7 @@ if( isset( $_GET['saveEditDiscount'] ) && isset( $_GET['id'] ) && isset( $_GET['
 	else
 	{
 		dbRollback();
-		echo 'fail';	
+		echo 'fail';
 	}
 }
 
@@ -43,7 +43,7 @@ if( isset( $_GET['validEditDiscountPermission'] ) && isset( $_POST['password'] )
 {
 	$id_emp = 0;
 	$password = $_POST['password'];
-	$qs = dbQuery("SELECT id_employee FROM tbl_employee JOIN tbl_access ON tbl_employee.id_profile = tbl_access.id_profile WHERE id_tab = '35' AND s_key = '".$password."'");	
+	$qs = dbQuery("SELECT id_employee FROM tbl_employee JOIN tbl_access ON tbl_employee.id_profile = tbl_access.id_profile WHERE id_tab = '35' AND s_key = '".$password."'");
 	if( dbNumRows($qs) == 1 )
 	{
 		list( $id_emp ) = dbFetchArray($qs);
@@ -65,19 +65,36 @@ if( isset( $_GET['saveConsign'] ) && isset( $_POST['id_order_consign'] ) )
 	$product		= new product();
 	$qs			= $consign->getConsignItems($id);
 	$sc			= true;
+	$message = '';
 
 	startTransection();
-
+	set_time_limit(150);
 	// Update status to Saved
 	$consign->changeStatus($id, 1);
 
 	while( $rs = dbFetchArray($qs) )
 	{
-		set_time_limit(150);
+		if($sc === FALSE)
+		{
+			break;
+		}
+
 		$id_pa 	= $rs['id_product_attribute'];
 		$id_pd	= $product->get_id_product($id_pa);
-		$usz		= update_stock_zone($rs['qty'] *-1, $id_zone, $id_pa);
-		$sm 		= stock_movement('out', 3, $id_pa, 2, $rs['qty'], $ref, $date_upd, $id_zone);
+		$pdCode = $product->product_reference($id_pa);
+		if(update_stock_zone($rs['qty'] *-1, $id_zone, $id_pa) === FALSE)
+		{
+			$sc = FALSE;
+			$message = 'Fail to update stock : '.$pdCode;
+		}
+
+		if(stock_movement('out', 3, $id_pa, 2, $rs['qty'], $ref, $date_upd, $id_zone) === FALSE)
+		{
+			$sc = FALSE;
+			$message = 'Fail to create stock movement : '.$pdCode;
+		}
+
+
 		$data		= array(
 						'reference'		=> $ref,
 						'id_cus'			=> $id_cus,
@@ -86,7 +103,7 @@ if( isset( $_GET['saveConsign'] ) && isset( $_POST['id_order_consign'] ) )
 						'id_pd'				=> $id_pd,
 						'id_pa'				=> $id_pa,
 						'p_name'			=> $product->product_name($id_pd),
-						'p_reference'	=> $product->product_reference($id_pa),
+						'p_reference'	=> $pdCode,
 						'barcode'			=> get_barcode($id_pa),
 						'price'				=> $rs['product_price'],
 						'cost'				=> $product->get_product_cost($id_pa),
@@ -96,23 +113,28 @@ if( isset( $_GET['saveConsign'] ) && isset( $_POST['id_order_consign'] ) )
 						'red_amount'	=> $rs['reduction_amount'],
 						'date_upd'		=> $date_upd
 				);
-		$rd	= $consign->consignSold($data);
-		if( !$rd || !$usz || !$sm )
-		{
-			$sc	= false;
-		}
-	}
 
-	if( $sc )
+		if($sc === TRUE)
+		{
+			if($consign->consignSold($data) === FALSE)
+			{
+				$sc = FALSE;
+				$message = 'บันทึกรายการไม่สำเร็จ : '.$pdCode;
+			}
+		}
+
+	} //--- End while
+
+	if( $sc === TRUE )
 	{
 		commitTransection();
-		echo 'success';
 	}
 	else
 	{
 		dbRollback();
-		echo 'fail';
 	}
+
+	echo $sc === TRUE ? 'success' : $message;
 
 }
 
@@ -177,11 +199,11 @@ if( isset( $_GET['cancleConsign'] ) )
 {
 	$id_cd = $_POST['id_order_consign'];
 	$consign = new consign($id_cd);
-	$rs		= $consign->changeStatus($id_cd, 2);	
+	$rs		= $consign->changeStatus($id_cd, 2);
 	if( $consign->id_consign_check != 0 )
 	{
 		$ck = new consignCheck();
-		$rd = $ck->changeStatus($consign->id_consign_check, 0);	
+		$rd = $ck->changeStatus($consign->id_consign_check, 0);
 	}
 	if( $rs )
 	{
@@ -348,15 +370,15 @@ if( isset( $_GET['deleteConsign'] ) && isset( $_POST['id_order_consign'] ) )
 		if( $cs->id_consign_check != 0 )
 		{
 			$ck = new consignCheck();
-			$re = $ck->changeStatus($cs->id_consign_check, 0);	
+			$re = $ck->changeStatus($cs->id_consign_check, 0);
 		}
 		else
 		{
-			$re = true;	
+			$re = true;
 		}
 		$rs = $cs->dropConsignDetail($id);
 		$rd = $cs->dropConsign($id);
-		
+
 
 		if( $rs && $rd && $re)
 		{
@@ -415,7 +437,7 @@ if( isset( $_GET['add_consign_diff'] ) )
 	$ck		= new consignCheck($id_cc);
 	$qs 		= $ck->getCheckDiff($id_cc);
 	$sc 		= true;
-	
+
 	if( dbNumRows($qs) > 0 )
 	{
 		$data	= array(
@@ -433,12 +455,12 @@ if( isset( $_GET['add_consign_diff'] ) )
 		$id			= $consign->addNewConsign($data); /// ได้ id_order_consign กลับมา (ถ้าสำเร็จ)
 		if( $id )
 		{
-			
+
 			while( $rs = dbFetchArray($qs) )
 			{
 				$id_pa 	= $rs['id_product_attribute'];
 				$qty 		= $rs['qty_stock'] - $rs['qty_check'];
-				
+
 				$item = array(
 							'id'			=> $id,
 							'id_pa'	=> $id_pa,
@@ -451,16 +473,16 @@ if( isset( $_GET['add_consign_diff'] ) )
 				if( !$rd ){ $sc = false; }
 			}
 			$rc = $ck->changeStatus($id_cc, 1);
-			
+
 			if( !$rc ){ $sc = false; }
 		}
 	}
-	
+
 	if( $sc )
 	{
 		commitTransection();
 		$mes = 'เพิ่มรายการตัดยอดฝากขายเรียบร้อยแล้ว';
-		header("location: ../index.php?content=consign&id_order_consign=".$id."&edit&message=".$mes);	
+		header("location: ../index.php?content=consign&id_order_consign=".$id."&edit&message=".$mes);
 	}
 	else
 	{
@@ -619,7 +641,7 @@ if(isset($_GET['print_diff'])){
 	$row = 22;
 	$sql = dbQuery("SELECT tbl_consign_check_detail.id_product_attribute, barcode, reference, qty_stock, qty_check FROM tbl_consign_check_detail LEFT JOIN tbl_product_attribute ON tbl_consign_check_detail.id_product_attribute = tbl_product_attribute.id_product_attribute WHERE id_consign_check = $id_consign_check AND qty_stock > qty_check ORDER BY barcode DESC");
 	$rs = dbNumRows($sql);
-	
+
 	$total_page = ceil($rs/$row);
 	$page = 1;
 	$count = 1;
@@ -641,7 +663,7 @@ if(isset($_GET['print_diff'])){
 					 <link rel='stylesheet' href='../../library/css/jquery-ui-1.10.4.custom.min.css' />
 					 <script src='../../library/js/jquery.min.js'></script>
 					<script src='../../library/js/jquery-ui-1.10.4.custom.min.js'></script>
-					<script src='../../library/js/bootstrap.min.js'></script>  
+					<script src='../../library/js/bootstrap.min.js'></script>
 					<!-- SB Admin CSS - Include with every page -->
 					<link href='../../library/css/sb-admin.css' rel='stylesheet'>
 					<link href='../../library/css/template.css' rel='stylesheet'>
@@ -680,7 +702,7 @@ if(isset($_GET['print_diff'])){
 				<!--<tr><td style='width:40%; padding:10px; height:5mm; vertical-align:text-top;'>เครดิตเทอม :</td><td style='padding:10px; vertical-align:text-top; height:5mm;'>".$customer->credit_term." วัน</td></tr>-->
 				</table>	</div></td></tr>
 	</table>
-	
+
 	<table class='table table-striped' align='center' style='width:100%; table-layout:fixed; margin-top:5px; ' id='order_detail'>
 	<tr>
 				<td style='width:10%; text-align:center; border:solid 1px #AAA; padding:10px;'>ลำดับ</td><td style='width:20%; text-align:center; border:solid 1px #AAA;  padding:10px'>บาร์โค้ด</td>
@@ -710,7 +732,7 @@ if(isset($_GET['print_diff'])){
 					<td colspan='2' style='border:solid 1px #AAA;  padding-left:10px; padding-right:10px;'>ราคารวม</td><td align='right' colspan='2' style='border:solid 1px #AAA;  padding-left:10px; padding-right:10px;'>".$total_order_amount."</td></tr>
 				</table>";
 	}
-	
+
 	if($rs>0){
 		echo $html.$doc_body_top.doc_head($reference,$company, $customer, $title,$page, $total_page,$date_add);
 			while($i<$rs){
@@ -734,8 +756,8 @@ if(isset($_GET['print_diff'])){
 				<td  style='text-align:center; vertical-align:middle; padding:3px; $css_row border-left: solid 1px #AAA; border-right: solid 1px #AAA; font-size: 10px;'>".number_format($price,2)."</td></tr>";
 				$i++;
 				$count++;
-				if($n==$rs){ 
-					$ba_row = $row - $count -7; 
+				if($n==$rs){
+					$ba_row = $row - $count -7;
 					$ba = 0;
 					if($ba_row >0){
 						while($ba <= $ba_row){
@@ -782,7 +804,7 @@ if(isset($_GET['print_balance'])){
 	$row = 22;
 	$sql = dbQuery("SELECT tbl_consign_check_detail.id_product_attribute, barcode, reference,qty_check FROM tbl_consign_check_detail LEFT JOIN tbl_product_attribute ON tbl_consign_check_detail.id_product_attribute = tbl_product_attribute.id_product_attribute WHERE id_consign_check = $id_consign_check AND qty_check != 0  ORDER BY barcode DESC");
 	$rs = dbNumRows($sql);
-	
+
 	$total_page = ceil($rs/$row);
 	$page = 1;
 	$count = 1;
@@ -804,7 +826,7 @@ if(isset($_GET['print_balance'])){
 					 <link rel='stylesheet' href='../../library/css/jquery-ui-1.10.4.custom.min.css' />
 					 <script src='../../library/js/jquery.min.js'></script>
 					<script src='../../library/js/jquery-ui-1.10.4.custom.min.js'></script>
-					<script src='../../library/js/bootstrap.min.js'></script>  
+					<script src='../../library/js/bootstrap.min.js'></script>
 					<!-- SB Admin CSS - Include with every page -->
 					<link href='../../library/css/sb-admin.css' rel='stylesheet'>
 					<link href='../../library/css/template.css' rel='stylesheet'>
@@ -843,7 +865,7 @@ if(isset($_GET['print_balance'])){
 				<!--<tr><td style='width:40%; padding:10px; height:5mm; vertical-align:text-top;'>เครดิตเทอม :</td><td style='padding:10px; vertical-align:text-top; height:5mm;'>".$customer->credit_term." วัน</td></tr>-->
 				</table>	</div></td></tr>
 	</table>
-	
+
 	<table class='table table-striped' align='center' style='width:100%; table-layout:fixed; margin-top:5px; ' id='order_detail'>
 	<tr>
 				<td style='width:10%; text-align:center; border:solid 1px #AAA; padding:10px;'>ลำดับ</td><td style='width:20%; text-align:center; border:solid 1px #AAA;  padding:10px'>บาร์โค้ด</td>
@@ -873,7 +895,7 @@ if(isset($_GET['print_balance'])){
 					<td colspan='2' style='border:solid 1px #AAA;  padding-left:10px; padding-right:10px;'>ราคารวม</td><td align='right' colspan='2' style='border:solid 1px #AAA;  padding-left:10px; padding-right:10px;'>".$total_order_amount."</td></tr>
 				</table>";
 	}
-	
+
 	if($rs>0){
 		echo $html.$doc_body_top.doc_head($reference,$company, $customer, $title,$page, $total_page,$date_add);
 			while($i<$rs){
@@ -896,8 +918,8 @@ if(isset($_GET['print_balance'])){
 				<td  style='text-align:center; vertical-align:middle; padding:3px; $css_row border-left: solid 1px #AAA; border-right: solid 1px #AAA; font-size: 10px;'>".number_format($price,2)."</td></tr>";
 				$i++;
 				$count++;
-				if($n==$rs){ 
-					$ba_row = $row - $count -7; 
+				if($n==$rs){
+					$ba_row = $row - $count -7;
 					$ba = 0;
 					if($ba_row >0){
 						while($ba <= $ba_row){
