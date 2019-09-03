@@ -11,7 +11,7 @@ error_reporting(E_ALL);
  //database connection config
 $dbHost = 'localhost';
 $dbUser = 'root';
-$dbPass = 'warrix';
+$dbPass = 'ZT20o15u21c3H808';
 $dbName = 'needsport';
 
 // setting up the web root, server root and company's name
@@ -48,7 +48,7 @@ $company = new company();
 $company->getCompany();
 define("COMPANY",$company->name);
 if(!isset($_COOKIE['get_rows'])){
-	setcookie("get_rows", 50,time()+(3600*24*365*30),'/');
+	setcookie("get_rows", 50, 31536000,'/');
 }
 
 ?>

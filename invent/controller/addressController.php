@@ -588,21 +588,23 @@ if( isset( $_GET['printOnlineAddressSheet'] ) && isset( $_GET['id_address'] ) )
 	$rightCol	.=				'<td width="15%" align="center">จำนวน</td>';
 	$rightCol	.=				'<td width="20%" align="right">มูลค่า</td>';
 	$rightCol	.=			'</tr>';
-	$qs	= dbQuery("SELECT id_product_attribute, SUM( qty ) as qty FROM tbl_qc WHERE id_order = ".$id_order." AND valid = 1 GROUP BY id_product_attribute");
+	//$qs	= dbQuery("SELECT id_product_attribute, SUM( qty ) as qty FROM tbl_qc WHERE id_order = ".$id_order." AND valid = 1 GROUP BY id_product_attribute");
+	$qs = dbQuery("SELECT *, SUM(sold_qty) AS qty FROM tbl_order_detail_sold WHERE id_order = ".$id_order." GROUP BY id_product_attribute");
 	$totalAmount 	= 0;
 	$totalDisc		= 0;
 	$deliFee			= getDeliveryFee($id_order);
+
 	if( dbNumRows($qs) > 0 )
 	{
 		$n	= 1;
-		while( $rs = dbFetchArray($qs) )
+		while( $rs = dbFetchObject($qs) )
 		{
-			$order->order_product_detail($rs['id_product_attribute']);
-			$p_reference	= $order->product_reference;
-			$qty				= $rs['qty'];
-			$price			= $order->product_price;
-			$p_dis			= $order->reduction_percent;
-			$a_dis			= $order->reduction_amount;
+			//$order->order_product_detail($rs['id_product_attribute']);
+			$p_reference	= $rs->product_reference;
+			$qty				= $rs->qty;
+			$price			= $rs->product_price;
+			$p_dis			= $rs->reduction_percent;
+			$a_dis			= $rs->reduction_amount;
 			$disc				= $p_dis > 0 ? $qty * ($price * ($p_dis * 0.01) ) : ( $a_dis > 0 ? $qty * $a_dis : 0 );
 			$amount			= $qty * $price;
 			$rightCol	.= 	'<tr style="font-size:10px;">';
