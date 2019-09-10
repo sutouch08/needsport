@@ -77,7 +77,11 @@ if(isset($_GET['removeValidPayment']))
 if( isset( $_GET['getOrderTable'] ) )
 {
 	$sc = 'fail';
-	$qs = dbQuery("SELECT * FROM tbl_payment WHERE valid = 0");
+	$qr = "SELECT p.*, ol.customer FROM tbl_payment AS p
+				 LEFT JOIN tbl_order_online AS ol ON p.id_order = ol.id_order
+				 WHERE p.valid = 0";
+
+	$qs = dbQuery($qr);
 	if( dbNumRows($qs) > 0 )
 	{
 		$ds = array();
@@ -96,7 +100,7 @@ if( isset( $_GET['getOrderTable'] ) )
 			$arr			= array(
 									"id"						=> $id,
 									"reference"			=> $order->reference,
-									"customer"			=> onlineCustomerName($id),
+									"customer"			=> $rs['customer'],
 									"orderAmount"		=> number_format($amount, 2), //--- ค่าสินค้า
 									"deliveryAmount"	=> number_format($shipFee, 2), //--- ค่าจัดส่ง
 									"serviceAmount"	=> number_format($servFee, 2), //--- ค่าบริการ

@@ -35,6 +35,7 @@ class order{
 	public $discount_amount;
 	public $final_price;
 	public $id_channels;
+	public $isCOD;
 
 	public function __construct($id_order="")
 	{
@@ -54,6 +55,7 @@ class order{
 			$this->valid 				= $order['valid'];
 			$this->role 				= $order['role'];
 			$this->id_channels = $order['id_channels'];
+			$this->isCOD = $order['isCOD'];
 			list($role_name) 		= dbFetchArray(dbQuery("SELECT role_name FROM tbl_order_role WHERE id_role =".$this->role));
 			$this->role_name 		= $role_name;
 			list($current_state_name) 	= dbFetchArray(dbQuery("SELECT state_name FROM tbl_order_state WHERE id_order_state =".$this->current_state));

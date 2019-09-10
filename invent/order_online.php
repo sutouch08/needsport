@@ -56,6 +56,7 @@
     <?php endif; ?>
 
     <?php if( !isset($_GET['add'] ) && !isset( $_GET['edit'] ) && !isset( $_GET['view_stock'] ) ) : ?>
+			<button type="button" class="btn btn-warning btn-sm" onClick="clearFilter()">Reset</button>
     	<?php if( $add ) : ?>
         <button type="button" class="btn btn-primary btn-sm" onClick="addNewOnline()"><i class="fa fa-plus"></i> เพิ่มใหม่ ( ออนไลน์ )</button>
 		<?php endif; ?>
@@ -63,7 +64,7 @@
        </p>
     </div>
 </div>
-<hr style='border-color:#CCC; margin-top: 5px; margin-bottom:15px;' />
+<hr style="border-color:#CCC; margin-top: 5px; margin-bottom:15px;" />
 
 <?php
 //*********************************************** เพิ่มออเดอร์ใหม่ ********************************************************//
@@ -73,7 +74,7 @@ if(isset($_GET['add'])) :
 	$id_order			= isset($_GET['id_order']) ? $_GET['id_order'] : '';
 	$active 				= isset($_GET['id_order']) ? 'disabled' : '';
 	$order 				= isset($_GET['id_order']) ? new order($id_order) : '';
-	$new_ref 			= isset($_GET['id_order']) ? $order->reference: get_max_role_reference("PREFIX_ORDER",1);
+	$new_ref 			= isset($_GET['id_order']) ? $order->reference: get_max_role_reference('PREFIX_ORDER',1);
 	$customer 			= isset($_GET['id_order']) ? new customer($order->id_customer) : '';
 	$id_customer 		= isset($_GET['id_order']) ? $customer->id_customer : '';
 	$customer_name 	= isset($_GET['id_order']) ? $customer->full_name : '';
@@ -81,61 +82,72 @@ if(isset($_GET['add'])) :
 	$payment 			= isset($_GET['id_order']) ? $order->payment : '';
 	$onlineCustomer	= isset($_GET['id_order']) ? getCustomerOnlineReference($id_order) : '';
 	$id_channels  = isset($_GET['id_order']) ? $order->id_channels : '';
+	$isCOD 	= isset($_GET['id_order']) ? $order->isCOD : 0;
+	$cod = $isCOD == 1 ? 'btn-success' : '';
+	$cod_text = $isCOD == 1 ? '<i class="fa fa-check"></i> เก็บเงินปลายทาง' : 'เก็บเงินปลายทาง';
 
 ?>
-<form id='addForm'>
-<div class='row'>
-	<input type='hidden' name='id_employee' value='<?php echo $user_id; ?>' />
-    <input type='hidden' name='id_order' id='id_order' value='<?php echo $id_order; ?>' />
-    <input type='hidden' name='id_customer' id='id_customer' value='<?php echo $id_customer; ?>' />
-    <input type="hidden" name="role" id="role" value="1" />
-	<div class='col-sm-2'>
+<form id="addForm">
+<div class="row">
+	<input type="hidden" name="id_employee" value="<?php echo $user_id; ?>" />
+  <input type="hidden" name="id_order" id="id_order" value="<?php echo $id_order; ?>" />
+  <input type="hidden" name="id_customer" id="id_customer" value="<?php echo $id_customer; ?>" />
+	<input type="hidden" name="isCOD" id="isCOD" value="<?php echo $isCOD; ?>" />
+  <input type="hidden" name="role" id="role" value="1" />
+
+	<div class="col-sm-1 col-1-harf padding-5 first">
     	<label>เลขที่เอกสาร</label>
-        <input type='text' id='doc_id' class='form-control input-sm' value='<?php echo $new_ref; ?>' disabled='disabled'/>
-    </div>
-	<div class='col-sm-2'>
+        <input type="text" id="doc_id" class="form-control input-sm text-center" value="<?php echo $new_ref; ?>" disabled="disabled"/>
+  </div>
+	<div class="col-sm-1 col-1-harf padding-5">
 		<label>วันที่</label>
-		<input type='text' id='doc_date' name='doc_date' class='form-control input-sm text-center' value='<?php echo date('d-m-Y'); ?>' <?php echo $active; ?> />
-    </div>
-	<div class='col-sm-4'>
-        	<label>ชื่อลูกค้า</label>
-            <input type='text' id='customer_name' class='form-control input-sm' value='<?php echo $customer_name; ?>' autocomplete='off' <?php echo $active; ?> />
-    </div>
-    <div class="col-sm-2">
-    	<label>อ้างอิงลูกค้า</label>
-        <input type="text" name="online" id="online" class="form-control input-sm" value="<?php echo $onlineCustomer; ?>" <?php echo $active; ?> />
-        <input type="hidden" name="payment" id="payment" value="ออนไลน์" />
-    </div>
-		<div class="col-sm-2">
+		<input type="text" id="doc_date" name="doc_date" class="form-control input-sm text-center" value="<?php echo date("d-m-Y"); ?>" <?php echo $active; ?> />
+  </div>
+	<div class="col-sm-4 padding-5">
+    <label>ชื่อลูกค้า</label>
+    <input type="text" id="customer_name" class="form-control input-sm" value="<?php echo $customer_name; ?>" autocomplete="off" <?php echo $active; ?> />
+  </div>
+  <div class="col-sm-2 padding-5">
+  	<label>อ้างอิงลูกค้า</label>
+    <input type="text" name="online" id="online" class="form-control input-sm" value="<?php echo $onlineCustomer; ?>" <?php echo $active; ?> />
+    <input type="hidden" name="payment" id="payment" value="ออนไลน์" />
+  </div>
+		<div class="col-sm-1 col-1-harf padding-5">
 			<label>ช่องทางขาย</label>
 			<select name="channels" id="channels" class="form-control input-sm" <?php echo $active; ?> >
 				<option value="xxx">เลือกช่องทางขาย</option>
 				<?php echo selectOnlineChannels($id_channels); ?>
 			</select>
 		</div>
-	<div class='col-sm-10'>
+	<div class="col-sm-1 col-1-harf padding-5 last">
+		<label class="display-block not-show">COD</label>
+		<button type="button" class="btn btn-sm btn-block <?php echo $cod; ?>" id="btn-cod" onclick="toggleCOD()" <?php echo $active; ?>>
+			<?php echo $cod_text; ?>
+		</button>
+	</div>
+	<div class="col-sm-10 padding-5 first">
 		<label>หมายเหตุ</label>
-    	<input type='text' id='comment' name='comment' class='form-control input-sm' value='<?php echo $comment; ?>' autocomplete='off' <?php echo $active; ?> />
+    	<input type="text" id="comment" name="comment" class="form-control input-sm" value="<?php echo $comment; ?>" autocomplete="off" <?php echo $active; ?> />
     </div>
-	<div class='col-sm-2'>
+	<div class="col-sm-2">
     	<label style="display:block; visibility:hidden">button</label>
     <?php if( !isset( $_GET['id_order'] ) ) : ?>
-		<button class='btn btn-default btn-sm btn-block' type='button' id='btnAdd' onClick="newOrder()">สร้างออเดอร์</button>
+		<button class="btn btn-default btn-sm btn-block" type="button" id="btnAdd" onClick="newOrder()">สร้างออเดอร์</button>
 	<?php else : ?>
 		<?php if( $edit ) : ?>
-        	<button class='btn btn-default btn-sm btn-block' type='button' id='btnEdit' onClick="editOrder()"><i class="fa fa-pencil"></i> แก้ไขออเดอร์</button>
-            <button type="button" class="btn btn-sm btn-success btn-block" id="btnUpdate" onClick="updateOrder(<?php echo $id_order; ?>)" style="display:none;"><i class="fa fa-save"></i> ปรับปรุง</button>
+        	<button class="btn btn-default btn-sm btn-block" type="button" id="btnEdit" onClick="editOrder()"><i class="fa fa-pencil"></i> แก้ไขออเดอร์</button>
+          <button type="button" class="btn btn-sm btn-success btn-block" id="btnUpdate" onClick="updateOrder(<?php echo $id_order; ?>)" style="display:none;"><i class="fa fa-save"></i> ปรับปรุง</button>
 		<?php endif; ?>
 	<?php endif; ?>
     </div>
 </div><!--/ row -->
 </form>
 
-<hr style='border-color:#CCC; margin-top: 15px; margin-bottom:15px;' />
+<hr style="border-color:#CCC; margin-top: 15px; margin-bottom:15px;" />
 
 <?php if( isset( $_GET['id_order'] ) ) :  ?>
 
-<div class='row'>
+<div class="row">
 	<div class="col-sm-3">
     	<input type="text" class="form-control input-sm text-center" id="sProduct" placeholder="ค้นหาสินค้า" />
     </div>
@@ -144,20 +156,20 @@ if(isset($_GET['add'])) :
     </div>
 </div>
 
-<hr style='border-color:#CCC; margin-top: 15px; margin-bottom:0px;' />
+<hr style="border-color:#CCC; margin-top: 15px; margin-bottom:0px;" />
 
 <!----------------------------------------- Category Menu ---------------------------------->
-<div class='row'>
-	<div class='col-sm-12'>
-		<ul class='nav navbar-nav' role='tablist' style='background-color:#EEE'>
+<div class="row">
+	<div class="col-sm-12">
+		<ul class="nav navbar-nav" role="tablist" style="background-color:#EEE">
 		<?php echo categoryTabMenu('order'); ?>
 		</ul>
 	</div><!---/ col-sm-12 ---->
 </div><!---/ row -->
-<hr style='border-color:#CCC; margin-top: 0px; margin-bottom:0px;' />
-<div class='row'>
-	<div class='col-sm-12'>
-		<div class='tab-content' style="min-height:1px; padding:0px;">
+<hr style="border-color:#CCC; margin-top: 0px; margin-bottom:0px;" />
+<div class="row">
+	<div class="col-sm-12">
+		<div class="tab-content" style="min-height:1px; padding:0px;">
 		<?php echo getCategoryTab(); ?>
 		</div>
 	</div>
@@ -165,39 +177,39 @@ if(isset($_GET['add'])) :
 <!------------------------------------ End Category Menu ------------------------------------>
 
 <form id="gridForm">
-	<div class='modal fade' id='order_grid' tabindex='-1' role='dialog' aria-labelledby='myModalLabel' aria-hidden='true'>
-		<div class='modal-dialog' id='modal'>
-			<div class='modal-content'>
-	  			<div class='modal-header'>
-					<button type='button' class='close' data-dismiss='modal' aria-hidden='true'>&times;</button>
-					<h4 class='modal-title' id='modal_title'>title</h4>
+	<div class="modal fade" id="order_grid" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+		<div class="modal-dialog" id="modal">
+			<div class="modal-content">
+	  			<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+					<h4 class="modal-title" id="modal_title">title</h4>
                     <center><span style="color: red;">ใน ( ) = ยอดคงเหลือทั้งหมด   ไม่มีวงเล็บ = สั่งได้ทันที</span></center>
                     <input type="hidden" name="id_order" value="<?php echo $id_order; ?>" />
 				 </div>
-				 <div class='modal-body' id='modal_body'></div>
-				 <div class='modal-footer'>
-					<button type='button' class='btn btn-default' data-dismiss='modal'>ปิด</button>
-					<button type='button' class='btn btn-primary' onClick="addToOrder(<?php echo $id_order; ?>)" >เพิ่มในรายการ</button>
+				 <div class="modal-body" id="modal_body"></div>
+				 <div class="modal-footer">
+					<button type="button" class="btn btn-default" data-dismiss="modal">ปิด</button>
+					<button type="button" class="btn btn-primary" onClick="addToOrder(<?php echo $id_order; ?>)" >เพิ่มในรายการ</button>
 				 </div>
 			</div>
 		</div>
 	</div>
 </form>
 
-<div class='row'>
-<div class='col-sm-12'>
-	<table class='table' id='order_detail' style="border: solid 1px #ddd;">
+<div class="row">
+<div class="col-sm-12">
+	<table class="table" id="order_detail" style="border: solid 1px #ddd;">
 	<thead>
-    <tr style='font-size: 12px;'>
-		<th stype='width:5%; text-align:center;'>ลำดับ</th>
-        <th style='width:5%; text-align:center;'>รูป</th>
-        <th style='width:10%;'>บาร์โค้ด</th>
-        <th style='width:30%;'>สินค้า</th>
-		<th style='width:10%; text-align:center;'>ราคา</th>
-        <th style='width:10%; text-align:center;'>จำนวน</th>
-		<th style='width:10%; text-align:center;'>ส่วนลด</th>
-        <th style='width:10%; text-align:center;'>มูลค่า</th>
-        <th style='text-align:center;'>การกระทำ</th>
+    <tr style="font-size: 12px;">
+		<th stype="width:5%; text-align:center;">ลำดับ</th>
+        <th style="width:5%; text-align:center;">รูป</th>
+        <th style="width:10%;">บาร์โค้ด</th>
+        <th style="width:30%;">สินค้า</th>
+		<th style="width:10%; text-align:center;">ราคา</th>
+        <th style="width:10%; text-align:center;">จำนวน</th>
+		<th style="width:10%; text-align:center;">ส่วนลด</th>
+        <th style="width:10%; text-align:center;">มูลค่า</th>
+        <th style="text-align:center;">การกระทำ</th>
 	</tr>
     </thead>
     <tbody id="orderProductTable">
@@ -207,30 +219,30 @@ if(isset($_GET['add'])) :
 <?php	if( dbNumRows($qs) > 0 ) :	?>
 <?php		$product = new product();	?>
 <?php		while( $rs = dbFetchArray($qs) ) :		?>
-		<tr style='font-size: 12px;'>
-        	<td style='text-align:center; vertical-align:middle;'><?php echo $n; ?></td>
-            <td style='text-align:center; vertical-align:middle;'><img src='<?php echo $product->get_product_attribute_image($rs['id_product_attribute'], 1); ?>' width='35px' height='35px' /> </td>
-            <td style='vertical-align:middle;'><?php echo $rs['barcode']; ?></td>
-            <td style='vertical-align:middle;'><?php echo $rs['product_reference']." : ".$rs['product_name']; ?></td>
-            <td style='text-align:center; vertical-align:middle;'><?php echo number_format($rs['product_price'], 2); ?></td>
-            <td style='text-align:center; vertical-align:middle;'><?php echo number_format($rs['product_qty']); ?></td>
-            <td style='text-align:center; vertical-align:middle;'><?php echo discountLabel($rs['reduction_percent'], $rs['reduction_amount']);  ?></td>
-            <td style='text-align:center; vertical-align:middle;'><?php echo number_format($rs['total_amount'], 2); ?></td>
-            <td style='text-align:center; vertical-align:middle;'>
+		<tr style="font-size: 12px;">
+        	<td style="text-align:center; vertical-align:middle;"><?php echo $n; ?></td>
+            <td style="text-align:center; vertical-align:middle;"><img src="<?php echo $product->get_product_attribute_image($rs['id_product_attribute'], 1); ?>" width="35px" height="35px" /> </td>
+            <td style="vertical-align:middle;"><?php echo $rs['barcode']; ?></td>
+            <td style="vertical-align:middle;"><?php echo $rs['product_reference']." : ".$rs['product_name']; ?></td>
+            <td style="text-align:center; vertical-align:middle;"><?php echo number_format($rs['product_price'], 2); ?></td>
+            <td style="text-align:center; vertical-align:middle;"><?php echo number_format($rs['product_qty']); ?></td>
+            <td style="text-align:center; vertical-align:middle;"><?php echo discountLabel($rs['reduction_percent'], $rs['reduction_amount']);  ?></td>
+            <td style="text-align:center; vertical-align:middle;"><?php echo number_format($rs['total_amount'], 2); ?></td>
+            <td style="text-align:center; vertical-align:middle;">
             	<button type="button" class="btn btn-danger btn-xs" onClick="deleteRow(<?php echo $rs['id_order_detail']; ?>, '<?php echo $rs['product_reference']; ?>')"><i class="fa fa-trash"></i></button>
             </td>
       	</tr>
 <?php	$tq += $rs['product_qty'];	$n++;		?>
 <?php endwhile; ?>
 	<tr>
-		<td colspan='6'></td>
+		<td colspan="6"></td>
         <td><h4>จำนวน</h4></td>
-        <td style='text-align:center; vertical-align:middle;'><h4><?php echo number_format($tq); ?></h4></td>
+        <td style="text-align:center; vertical-align:middle;"><h4><?php echo number_format($tq); ?></h4></td>
         <td><h4>ชิ้น<h4></td>
 	</tr>
 <?php else : ?>
 	<tr>
-    	<td colspan='9' align='center'><h4>&nbsp;</h4></td>
+    	<td colspan="9" align="center"><h4>&nbsp;</h4></td>
     </tr>
 <?php endif; ?>
 	</tbody>
@@ -259,17 +271,17 @@ if(isset($_GET['add'])) :
 	$onlineCustomer = getCustomerOnlineReference($id_order);
 	$online 			= $order->payment == 'ออนไลน์' ? TRUE : FALSE;
 ?>
-<input type='hidden' name='id_order' id='id_order' value='<?php echo $id_order; ?>' />
+<input type="hidden" name="id_order" id="id_order" value="<?php echo $id_order; ?>" />
 <div class="row">
 	<div class="col-sm-12">
     	<h5 class="title">
 		<?php 	echo $order->reference." - ";  	if($order->id_customer != "0") : echo $customer->full_name; endif; ?>
         <?php 	if( $online && $onlineCustomer != '') : echo ' ( '.$onlineCustomer.' ) '; endif; ?>
-        <p class='pull-right'>พนักงาน : &nbsp; <?php echo $sale->full_name; ?></p>
+        <p class="pull-right">พนักงาน : &nbsp; <?php echo $sale->full_name; ?></p>
         </h5>
     </div>
 </div>
-<hr style='border-color:#CCC; margin-top: 0px; margin-bottom:5px;' />
+<hr style="border-color:#CCC; margin-top: 0px; margin-bottom:5px;" />
 <div class="row">
 	<div class="col-sm-12">
 		<dl><dt>วันที่สั่ง : <dd><?php echo thaiDate($order->date_add); ?></dd> | </dt></dl>
@@ -277,7 +289,7 @@ if(isset($_GET['add'])) :
 		<dl><dt>จำนวน : <dd><?php echo number_format($order->total_qty); ?></dd> | </dt></dl>
 		<dl><dt>ยอดเงิน : <dd><?php echo number_format($order->total_amount,2); ?></dd> </dt></dl>
 
-        <p class='pull-right' style="margin-bottom:0px;">
+        <p class="pull-right" style="margin-bottom:0px;">
 
         <?php if( $online ) : ?>
         		ค่าจัดส่ง :
@@ -305,12 +317,12 @@ if(isset($_GET['add'])) :
         </p>
 	</div>
 </div><!-- /row -->
-<hr style='border-color:#CCC; margin-top: 5px; margin-bottom:5px;' />
+<hr style="border-color:#CCC; margin-top: 5px; margin-bottom:5px;" />
 <div class="row"><div class="col-sm-12" style="padding-bottom:5px;"><?php echo paymentLabel($id_order); ?><?php echo emsLabel($id_order); ?><?php echo closedLabel($id_order); ?></div></div>
-<div class='row'>
+<div class="row">
     <?php  	$ado = getOnlineAddress($id_order);	?>
     <div class="col-sm-12">
-    	<table class='table table-bordered'>
+    	<table class="table table-bordered">
         <thead>
         <tr><td colspan="6" align="center">ที่อยู่สำหรับจัดส่ง  <p class="pull-right top-p"><button type="button" class="btn btn-info btn-xs" onClick="addNewAddress()"> เพิ่มที่อยู่ใหม่</button></p></td></tr>
         <tr style="font-size:12px;">
@@ -351,17 +363,17 @@ if(isset($_GET['add'])) :
 
 
 </div><!-- /row-->
-<hr style='border-color:#CCC; margin-top: 0px; margin-bottom:15px;' />
-<form id='editOrderForm'>
-<div class='row'>
-    <div class='col-sm-12'>
+<hr style="border-color:#CCC; margin-top: 0px; margin-bottom:15px;" />
+<form id="editOrderForm">
+<div class="row">
+    <div class="col-sm-12">
 <!---------------------------------------------------------------------  Order Table  ----------------------------------------------------------->
 <?php $l_discount = bill_discount($id_order); 	?>
 <?php 	$orderTxt	= '';							?>
 <?php if($order->current_state != 9 && $order->current_state != 8 && $order->valid == 0) : ?>
 	<?php if($edit || $add) : ?>
-        <button type='button' id='edit_reduction' class='btn btn-default btn-sm' >แก้ไขส่วนลด</button>
-        <button type='button' id='save_reduction' class='btn btn-default btn-sm' onclick="verifyPassword()" style="display:none;" >บันทึกส่วนลด</button>
+        <button type="button" id="edit_reduction" class="btn btn-default btn-sm" >แก้ไขส่วนลด</button>
+        <button type="button" id="save_reduction" class="btn btn-default btn-sm" onclick="verifyPassword()" style="display:none;" >บันทึกส่วนลด</button>
        	<?php if(!$l_discount) : ?>
        		<button type="button" id="btn_add_discount" class="btn btn-default btn-sm" ><i class="fa fa-plus"></i>&nbsp;เพิ่มส่วนลดท้ายบิล</button>
             <button type="button" id="btn_save_discount" class="btn btn-success btn-sm" onclick="add_discount()" style="display:none;"><i class="fa fa-save"></i>&nbsp;บันทึกส่วนลดท้ายบิล</button>
@@ -378,15 +390,15 @@ if(isset($_GET['add'])) :
        </p>
 	<?php endif; ?>
 <?php endif; ?>
-	<table id='product_table' class='table table-striped' style='width:100%; padding:10px; border: 1px solid #ccc; margin-top:10px;'>
+	<table id="product_table" class="table table-striped" style="width:100%; padding:10px; border: 1px solid #ccc; margin-top:10px;">
     <thead>
-    	<th style='width:10%; text-align:center;'>รูปภาพ</th>
+    	<th style="width:10%; text-align:center;">รูปภาพ</th>
         <th>สินค้า</th>
-        <th style='width:10%; text-align:center;'>ราคา</th>
-        <th style='width:12%; text-align:center;'>ส่วนลด</th>
-        <th style='width:10%; text-align:center;'>จำนวน</th>
-        <th style='width:10%; text-align:center;'>มูลค่า</th>
-        <th style='width:5% text-align:center;'></th>
+        <th style="width:10%; text-align:center;">ราคา</th>
+        <th style="width:12%; text-align:center;">ส่วนลด</th>
+        <th style="width:10%; text-align:center;">จำนวน</th>
+        <th style="width:10%; text-align:center;">มูลค่า</th>
+        <th style="width:5% text-align:center;"></th>
     </thead>
     <tbody id="orderTable">
 <?php	$qs = dbQuery("SELECT * FROM tbl_order_detail WHERE id_order = ".$id_order);		?>
@@ -400,23 +412,23 @@ if(isset($_GET['add'])) :
 <?php 			$id_pa 	= $rs['id_product_attribute']; 	?>
 <?php 			$disc		= $rs['reduction_percent'] > 0 ? $rs['reduction_percent'] : $rs['reduction_amount']; 	?>
 				<tr id="row_<?php echo $id; ?>" style="font-size:12px;">
-                    <td style='text-align:center; vertical-align:middle;'><img src="<?php echo $product->get_product_attribute_image($id_pa,1); ?>"  /></td>
-                    <td style='vertical-align:middle;'><?php echo $rs['product_reference']." : ".get_product_name($rs['id_product'])." : ".$rs['barcode']; ?></td>
-                    <td style='text-align:center; vertical-align:middle;'><span id="price_<?php echo $id; ?>"><?php echo number_format($rs['product_price'], 2); ?></span></td>
-                    <td style='text-align:center; vertical-align:middle;'>
-                        <p class='reduction'><?php echo discountLabel($rs['reduction_percent'], $rs['reduction_amount']); ?></p>
-                       <div class='input_reduction' style='display:none;'>
-                       		<input type='text' class='form-control input-sm input-discount' id="reduction<?php echo $id; ?>"
-                       				name="reduction[<?php echo $id; ?>]" value='<?php echo $disc; ?>' onKeyUp="verifyDiscount(<?php echo $id; ?>, '<?php echo $rs['product_price']; ?>')" />
+                    <td style="text-align:center; vertical-align:middle;"><img src="<?php echo $product->get_product_attribute_image($id_pa,1); ?>"  /></td>
+                    <td style="vertical-align:middle;"><?php echo $rs['product_reference']." : ".get_product_name($rs['id_product'])." : ".$rs['barcode']; ?></td>
+                    <td style="text-align:center; vertical-align:middle;"><span id="price_<?php echo $id; ?>"><?php echo number_format($rs['product_price'], 2); ?></span></td>
+                    <td style="text-align:center; vertical-align:middle;">
+                        <p class="reduction"><?php echo discountLabel($rs['reduction_percent'], $rs['reduction_amount']); ?></p>
+                       <div class="input_reduction" style="display:none;">
+                       		<input type="text" class="form-control input-sm input-discount" id="reduction<?php echo $id; ?>"
+                       				name="reduction[<?php echo $id; ?>]" value="<?php echo $disc; ?>" onKeyUp="verifyDiscount(<?php echo $id; ?>, '<?php echo $rs['product_price']; ?>')" />
                             <select class="form-control input-sm input-unit" id="unit<?php echo $id; ?>" name="unit[<?php echo $id; ?>]" onChange="verifyDiscount(<?php echo $id; ?>, '<?php echo $rs['product_price']; ?>')" >
                                 <option value="percent" <?php if( $rs['reduction_percent'] > 0 ) { echo "selected"; } ?> >%</option>
                                 <option value="amount" <?php if( $rs['reduction_amount'] > 0 ) { echo "selected"; } ?> >฿</option>
                             </select>
                         </div>
                     </td>
-                    <td style='text-align:center; vertical-align:middle;'>	<?php echo number_format($rs['product_qty']); ?></td>
-                    <td style='text-align:center; vertical-align:middle;'><?php echo number_format($rs['total_amount'], 2); ?></td>
-                    <td style='text-align:center; vertical-align:middle;'>
+                    <td style="text-align:center; vertical-align:middle;">	<?php echo number_format($rs['product_qty']); ?></td>
+                    <td style="text-align:center; vertical-align:middle;"><?php echo number_format($rs['total_amount'], 2); ?></td>
+                    <td style="text-align:center; vertical-align:middle;">
                     <?php if($edit && ($order->current_state == 3 || $order->current_state == 1 ) ) : ?>
                             <button type="button" class="btn btn-danger btn-xs" onClick="deleteItem(<?php echo $id; ?>, '<?php echo $rs['product_reference']; ?>')"><i class="fa fa-trash"></i></button>
                     <?php endif; ?>
@@ -456,17 +468,17 @@ if(isset($_GET['add'])) :
 <?php endif; ?>
 
 		<tr>
-			<td rowspan='3' colspan='4'></td>
-			<td style='border-left:1px solid #ccc'><b>สินค้า</b></td>
-            <td colspan='2' align='right' id="total_price"><b><?php echo number_format($total_price,2); ?> </b></td>
+			<td rowspan="3" colspan="4"></td>
+			<td style="border-left:1px solid #ccc"><b>สินค้า</b></td>
+            <td colspan="2" align="right" id="total_price"><b><?php echo number_format($total_price,2); ?> </b></td>
        </tr>
 		<tr>
-        	<td style='border-left:1px solid #ccc'><b>ส่วนลด</b></td>
-        	<td colspan='2' align='right' id="total_disc"><b><?php echo number_format(($total_disc + $l_discount), 2); ?> </b></td>
+        	<td style="border-left:1px solid #ccc"><b>ส่วนลด</b></td>
+        	<td colspan="2" align="right" id="total_disc"><b><?php echo number_format(($total_disc + $l_discount), 2); ?> </b></td>
         </tr>
 		<tr>
-        	<td style='border-left:1px solid #ccc'><b>สุทธิ </b></td>
-        	<td colspan='2' align='right' id="net"><b><?php echo number_format(($total_amount-$l_discount),2); ?> </b></td>
+        	<td style="border-left:1px solid #ccc"><b>สุทธิ </b></td>
+        	<td colspan="2" align="right" id="net"><b><?php echo number_format(($total_amount-$l_discount),2); ?> </b></td>
         </tr>
 <?php 	$orderTxt .= '--------------------------------------- <br/>';	?>
 <?php 	if( ($total_disc + $l_discount) > 0 )
@@ -508,7 +520,7 @@ if(isset($_GET['add'])) :
 
 <?php	else :  ?>
 		<tr>
-            <td colspan='7' align='center'><h4>ไม่มีรายการสินค้า</h4></td>
+            <td colspan="7" align="center"><h4>ไม่มีรายการสินค้า</h4></td>
        	</tr>
 
 <?php endif;  ?>
@@ -518,8 +530,8 @@ if(isset($_GET['add'])) :
 <!--------------------------------------------------------------------  End order table  --------------------------------------------------------->
 	</div>
 </div>
-<div class='row'>
-	<div class='col-sm-12'>
+<div class="row">
+	<div class="col-sm-12">
     	<p>
         <strong>หมายเหตุ :  </strong><?php if($order->comment ==""){ echo"ไม่มีข้อความ";}else{ echo $order->comment; } ?></p>
     </div>
@@ -527,38 +539,38 @@ if(isset($_GET['add'])) :
 <h4>&nbsp;</h4>
 </form>
 <!----------  สรุปยอดส่ง Line --------->
-<div class='modal fade' id='orderSummaryTab' tabindex='-1' role='dialog' aria-labelledby='myModalLabel' aria-hidden='true'>
-    <div class='modal-dialog' style="width:300px;">
-        <div class='modal-content'>
-            <div class='modal-header'>
-                <button type='button' class='close' data-dismiss='modal' aria-hidden='true'>&times;</button>
+<div class="modal fade" id="orderSummaryTab" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog" style="width:300px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
             </div>
-            <div class='modal-body' id="summaryText">
+            <div class="modal-body" id="summaryText">
             		<?php echo $orderTxt; ?>
             </div>
-            <div class='modal-footer'>
-                <button class="btn btn-sm btn-info btn-block" data-dismiss='modal' data-clipboard-action="copy" data-clipboard-target="#summaryText">Copy</button>
+            <div class="modal-footer">
+                <button class="btn btn-sm btn-info btn-block" data-dismiss="modal" data-clipboard-action="copy" data-clipboard-target="#summaryText">Copy</button>
             </div>
         </div>
     </div>
 </div>
 
-<div class='modal fade' id='ModalLogin' tabindex='-1' role='dialog' aria-labelledby='myModalLabel' aria-hidden='true'>
-	<div class='modal-dialog ' style='width: 350px;'>
-		<div class='modal-content'>
-			<div class='modal-header'>
-				<button type='button' class='close' data-dismiss='modal' aria-hidden='true'> &times; </button>
-				<h4 class='modal-title-site text-center' > รหัสลับผู้มีอำนาจการแก้ไขส่วนลด </h4>
+<div class="modal fade" id="ModalLogin" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+	<div class="modal-dialog " style="width: 350px;">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-hidden="true"> &times; </button>
+				<h4 class="modal-title-site text-center" > รหัสลับผู้มีอำนาจการแก้ไขส่วนลด </h4>
 			</div>
-			<input type='hidden' id='id_employee' name='id_employee' />
-			<div class='modal-body'>
-				<div class='form-group login-password'>
-					<input name='password' id='password' class='form-control input'  size='20' placeholder='รหัสลับ' type='password' />
+			<input type="hidden" id="id_employee" name="id_employee" />
+			<div class="modal-body">
+				<div class="form-group login-password">
+					<input name="password" id="password" class="form-control input"  size="20" placeholder="รหัสลับ" type="password" />
 				</div>
-				<input id='login' class='btn  btn-block btn-lg btn-primary' value='ตกลง' type='button' onclick='checkPassword()' />
+				<input id="login" class="btn  btn-block btn-lg btn-primary" value="ตกลง" type="button" onclick="checkPassword()" />
 			</div>
-			<p style='text-align:center; color:red;' id='message'></p>
-			<div class='modal-footer'>
+			<p style="text-align:center; color:red;" id="message"></p>
+			<div class="modal-footer">
 			</div>
 		</div>
 	</div>
@@ -568,22 +580,22 @@ $('#ModalLogin').on('shown.bs.modal', function () {  $('#password').focus(); });
 $("#password").keyup(function(e) { if(e.keyCode == 13 ){ checkPassword(); }});
 </script>
 
-<div class='modal fade' id='modal_approve' tabindex='-1' role='dialog' aria-labelledby='myModalLabel' aria-hidden='true'>
-	<div class='modal-dialog ' style='width: 350px;'>
-		<div class='modal-content'>
-			<div class='modal-header'>
-				<button type='button' class='close' data-dismiss='modal' aria-hidden='true'> &times; </button>
-				<h4 class='modal-title-site text-center' > รหัสลับผู้มีอำนาจอนุมัติส่วนลด</h4>
+<div class="modal fade" id="modal_approve" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+	<div class="modal-dialog " style="width: 350px;">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-hidden="true"> &times; </button>
+				<h4 class="modal-title-site text-center" > รหัสลับผู้มีอำนาจอนุมัติส่วนลด</h4>
 			</div>
-			<input type='hidden' id='id_approve' name='id_approve'>
-			<div class='modal-body'>
-				<div class='form-group login-password'>
-					<input name='password' id='bill_password' class='form-control input'  size='20' placeholder='รหัสลับ' type='password' />
+			<input type="hidden" id="id_approve" name="id_approve">
+			<div class="modal-body">
+				<div class="form-group login-password">
+					<input name="password" id="bill_password" class="form-control input"  size="20" placeholder="รหัสลับ" type="password" />
 				</div>
-				<input class='btn  btn-block btn-lg btn-primary' value='ตกลง' type='button' onclick='valid_password()' />
+				<input class="btn  btn-block btn-lg btn-primary" value="ตกลง" type="button" onclick="valid_password()" />
 			</div>
-			<p style='text-align:center; color:red;' id='bill_message'></p>
-			<div class='modal-footer'>
+			<p style="text-align:center; color:red;" id="bill_message"></p>
+			<div class="modal-footer">
 			</div>
 		</div>
 	</div>
@@ -592,22 +604,22 @@ $("#password").keyup(function(e) { if(e.keyCode == 13 ){ checkPassword(); }});
 $('#modal_approve').on('shown.bs.modal', function () {  $('#bill_password').focus(); });
 </script>
 
-<div class='modal fade' id='modal_approve_edit' tabindex='-1' role='dialog' aria-labelledby='myModalLabel' aria-hidden='true'>
-	<div class='modal-dialog ' style='width: 350px;'>
-		<div class='modal-content'>
-			<div class='modal-header'>
-				<button type='button' class='close' data-dismiss='modal' aria-hidden='true'> &times; </button>
-				<h4 class='modal-title-site text-center' > รหัสลับผู้มีอำนาจอนุมัติส่วนลด</h4>
+<div class="modal fade" id="modal_approve_edit" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+	<div class="modal-dialog " style="width: 350px;">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-hidden="true"> &times; </button>
+				<h4 class="modal-title-site text-center" > รหัสลับผู้มีอำนาจอนุมัติส่วนลด</h4>
 			</div>
-			<div class='modal-body'>
-				<div class='form-group login-password'>
-					<input name='password' id='edit_bill_password' class='form-control input'  size='20' placeholder='รหัสลับ' type='password' />
+			<div class="modal-body">
+				<div class="form-group login-password">
+					<input name="password" id="edit_bill_password" class="form-control input"  size="20" placeholder="รหัสลับ" type="password" />
 				</div>
-				<input class='btn  btn-block btn-lg btn-primary' value='ตกลง' type='button' onclick='valid_approve()' >
+				<input class="btn  btn-block btn-lg btn-primary" value="ตกลง" type="button" onclick="valid_approve()" >
 				<!--userForm-->
 			</div>
-			<p style='text-align:center; color:red;' id='edit_bill_message'></p>
-			<div class='modal-footer'>
+			<p style="text-align:center; color:red;" id="edit_bill_message"></p>
+			<div class="modal-footer">
 			</div>
 		</div>
 	</div>
@@ -616,14 +628,14 @@ $('#modal_approve').on('shown.bs.modal', function () {  $('#bill_password').focu
 $('#modal_approve_edit').on('shown.bs.modal', function () {  $('#edit_bill_password').focus(); });
 </script>
 <!-------------  Add New Address Modal  --------->
-<div class='modal fade' id='addressModal' tabindex='-1' role='dialog' aria-labelledby='myModalLabel' aria-hidden='true'>
-    <div class='modal-dialog' style="width:500px;">
-        <div class='modal-content'>
-            <div class='modal-header'>
-                <button type='button' class='close' data-dismiss='modal' aria-hidden='true'>&times;</button>
-                <h4 class='modal-title-site text-center' >เพิ่ม/แก้ไข ที่อยู่สำหรับจัดส่ง</h4>
+<div class="modal fade" id="addressModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog" style="width:500px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title-site text-center" >เพิ่ม/แก้ไข ที่อยู่สำหรับจัดส่ง</h4>
             </div>
-            <div class='modal-body'>
+            <div class="modal-body">
             <form id="addAddressForm"	>
             <input type="hidden" name="id_address" id="id_address" />
             <div class="row">
@@ -666,7 +678,7 @@ $('#modal_approve_edit').on('shown.bs.modal', function () {  $('#edit_bill_passw
             </div>
             </form>
             </div>
-            <div class='modal-footer'>
+            <div class="modal-footer">
                 <button type="button" class="btn btn-sm btn-success" onClick="saveAddress()" ><i class="fa fa-save"></i> บันทึก</button>
             </div>
         </div>
@@ -675,14 +687,14 @@ $('#modal_approve_edit').on('shown.bs.modal', function () {  $('#edit_bill_passw
 
 <?php $bank = getActiveBank(); ?>
 <!-------------  เลือกธนาคารที่แจ้งชำระ  --------->
-<div class='modal fade' id='selectBankModal' tabindex='-1' role='dialog' aria-labelledby='myModalLabel' aria-hidden='true'>
-    <div class='modal-dialog' style="width:400px;">
-        <div class='modal-content'>
-            <div class='modal-header'>
-                <button type='button' class='close' data-dismiss='modal' aria-hidden='true'>&times;</button>
-                <h4 class='modal-title-site text-center' >เลือกช่องทางการชำระเงิน</h4>
+<div class="modal fade" id="selectBankModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog" style="width:400px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title-site text-center" >เลือกช่องทางการชำระเงิน</h4>
             </div>
-            <div class='modal-body'>
+            <div class="modal-body">
             	<div class="row">
 	<?php if( dbNumRows($bank) > 0 ) : ?>
     <?php	while( $rs = dbFetchArray($bank) ) : ?>
@@ -703,7 +715,7 @@ $('#modal_approve_edit').on('shown.bs.modal', function () {  $('#edit_bill_passw
     <?php endif; ?>
 				</div>
             </div>
-            <div class='modal-footer'>
+            <div class="modal-footer">
             </div>
         </div>
     </div>
@@ -714,13 +726,13 @@ $('#modal_approve_edit').on('shown.bs.modal', function () {  $('#edit_bill_passw
 <input type="hidden" name="id_account" id="id_account"/>
 <input type="hidden" name="orderAmount" id="orderAmount" value="<?php echo $payAmount; ?>" />
 <input type="file" name="image" id="image" accept="image/*" style="display:none;" />
-<div class='modal fade' id='paymentModal' tabindex='-1' role='dialog' aria-labelledby='myModalLabel' aria-hidden='true'>
-    <div class='modal-dialog' style="width:400px;">
-        <div class='modal-content'>
-            <div class='modal-header'>
-                <button type='button' class='close' data-dismiss='modal' aria-hidden='true'>&times;</button>
+<div class="modal fade" id="paymentModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog" style="width:400px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
             </div>
-            <div class='modal-body'>
+            <div class="modal-body">
                 <div class="col-sm-12" style="padding-bottom:15px; margin-bottom:15px; border-bottom:solid 1px #eee;">
                 	<span style="font-size:25px; color:#75ce66;">จำนวน <?php echo number_format($payAmount, 2); ?> ฿ </span>
                 </div>
@@ -774,7 +786,7 @@ $('#modal_approve_edit').on('shown.bs.modal', function () {  $('#edit_bill_passw
                     </div><!--/ row -->
                 </div>
             </div>
-            <div class='modal-footer'>
+            <div class="modal-footer">
             	<button type="button" class="btn btn-sm btn-primary" onClick="submitPayment()" ><i class="fa fa-save"></i> บันทึก</button>
             </div>
         </div>
@@ -782,21 +794,21 @@ $('#modal_approve_edit').on('shown.bs.modal', function () {  $('#edit_bill_passw
 </div>
 </form>
 
-<div class='modal fade' id='deliveryModal' tabindex='-1' role='dialog' aria-labelledby='myModalLabel' aria-hidden='true'>
-	<div class='modal-dialog ' style='width: 350px;'>
-		<div class='modal-content'>
-			<div class='modal-header'>
-				<button type='button' class='close' data-dismiss='modal' aria-hidden='true'> &times; </button>
-				<h4 class='modal-title-site' >บันทึกเลขที่การจัดส่ง</h4>
+<div class="modal fade" id="deliveryModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+	<div class="modal-dialog " style="width: 350px;">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-hidden="true"> &times; </button>
+				<h4 class="modal-title-site" >บันทึกเลขที่การจัดส่ง</h4>
 			</div>
-			<div class='modal-body'>
+			<div class="modal-body">
 				<div class="row">
                 	<div class="col-sm-12">
                         <input type="text" class="form-control input-sm" name="emsNo" id="emsNo" placeholder="เลขที่ EMS หรือ เลขที่การจัดส่ง" />
                     </div>
                 </div>
 			</div>
-			<div class='modal-footer'>
+			<div class="modal-footer">
             	<button type="button" class="btn btn-sm btn-primary btn-block" onClick="saveDeliveryNo()">บันทึก</button>
 			</div>
 		</div>
@@ -804,18 +816,18 @@ $('#modal_approve_edit').on('shown.bs.modal', function () {  $('#edit_bill_passw
 </div>
 
 
-<div class='modal fade' id='paymentDetailModal' tabindex='-1' role='dialog' aria-labelledby='myModalLabel' aria-hidden='true'>
-	<div class='modal-dialog ' style='width:400px;'>
-		<div class='modal-content'>
-			<div class='modal-header'>
-				<button type='button' class='close' data-dismiss='modal' aria-hidden='true'> &times; </button>
-				<h4 class='modal-title-site' >ข้อมูลการชำระเงิน</h4>
+<div class="modal fade" id="paymentDetailModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+	<div class="modal-dialog " style="width:400px;">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-hidden="true"> &times; </button>
+				<h4 class="modal-title-site" >ข้อมูลการชำระเงิน</h4>
 			</div>
-			<div class='modal-body' id="paymentDetailBody">
+			<div class="modal-body" id="paymentDetailBody">
 
 			</div>
-			<div class='modal-footer'>
-            	<button type="button" class="btn btn-sm btn-default" data-dismiss='modal' >Close</button>
+			<div class="modal-footer">
+            	<button type="button" class="btn btn-sm btn-default" data-dismiss="modal" >Close</button>
 			</div>
 		</div>
 	</div>
@@ -824,40 +836,45 @@ $('#modal_approve_edit').on('shown.bs.modal', function () {  $('#edit_bill_passw
 <?php else : ?>
 <!----------------------------------------------------- แสดงรายการ -------------------------------------------------->
 <?php
-	$s_ref 	= isset( $_POST['s_ref'] ) ? $_POST['s_ref'] : ( getCookie('s_ref') ? getCookie('s_ref') : '');
-	$s_cus 	= isset( $_POST['s_cus'] ) ? $_POST['s_cus'] : ( getCookie('s_cus') ? getCookie('s_cus') : '' );
-	$s_emp	= isset( $_POST['s_emp'] ) ? $_POST['s_emp'] : ( getCookie('s_emp') ? getCookie('s_emp') : '');
-	$from		= isset( $_POST['from_date'] ) ? $_POST['from_date'] : ( getCookie('orderFrom') ? getCookie('orderFrom') : '');
-	$to		= isset( $_POST['to_date'] ) ? $_POST['to_date'] : ( getCookie('orderTo') ? getCookie('orderTo') : '');
+	$s_ref 	= getFilter('s_ref', 's_ref', '');
+	$s_cus 	= getFilter('s_cus', 's_cus', '');
+	$s_emp	= getFilter('s_emp', 's_emp', '');
+	$from		= getFilter('from_date', 'orderFrom', '');
+	$to		  = getFilter('to_date', 'orderTo', '');
 	//----- เฉพาะฉัน  ------//
-	$vt			= isset( $_POST['viewType'] ) ? $_POST['viewType'] : (getCookie('viewType') ? getCookie('viewType') : 0 );
+	$vt			= getFilter('viewType', 'viewType', 0);
 	$me		= $vt == 1 ? 'btn-info' : '';
+	$cod  = getFilter('cod','isCOD', 0);
+	$btn_cod = $cod == 1 ? 'btn-info' : '';
+	$unPaid = getFilter('unPaid', 'unPaid', 0);
+	$btn_paid = $unPaid == 1 ? 'btn-info' : '';
+
 	if( isset( $_POST['viewType'] ) ){ createCookie('viewType', $vt, 3600*24*60); }
 
 	//-------  เปิดบิลแล้ว  ------//
-	$is_closed 	= isset( $_POST['closed'] ) ? $_POST['closed'] : ( getCookie('closed') ? getCookie('closed') : 0 );
+	$is_closed 	= getFilter('closed', 'closed', 0);
 	$closed		= $is_closed == 1 ? 'btn-info' : '';
 	if( isset( $_POST['closed'] ) ){ createCookie('closed', $is_closed, 3600*24*60); }
 
 	//---------  ยังแจ้งการจัดส่ง ? -------//
-	$delivered	= isset( $_POST['delivered'] ) ? $_POST['delivered'] : ( getCookie('delivered') ? getCookie('delivered') : 0 ); //--- ถ้าต้องการกรองเฉพาะตัวที่ยังไม่ได้แจ้งการจัดส่ง --//
+	$delivered	= getFilter('delivered', 'delivered', 0);//--- ถ้าต้องการกรองเฉพาะตัวที่ยังไม่ได้แจ้งการจัดส่ง --//
 	$dv			= $delivered == 1 ? 'btn-info' : '';
 	if( isset( $_POST['delivered'] ) ){ createCookie('delivered', $delivered, 3600*24*60); }
 
 	$paginator = new paginator();
-	$get_rows = isset( $_POST['get_rows'] ) ? $_POST['get_rows'] : ( getCookie('get_rows') ? getCookie('get_rows') : 50);
+	$get_rows = getFilter('get_rows', 'get_rows', 50);
 ?>
-<form  method='post' id='searchForm'>
+<form  method="post" id="searchForm">
 <div class="row">
-	<div class="col-sm-2 padding-5" style="padding-left:15px;">
+	<div class="col-sm-1 col-1-harf padding-5 first" style="padding-left:15px;">
  		<label>เอกสาร</label>
         <input type="text" class="form-control input-sm" id="s_ref" name="s_ref" value="<?php echo $s_ref; ?>" placeholder="พิมพ์เลขที่เอกสาร" />
     </div>
-    <div class="col-sm-2 padding-5">
+    <div class="col-sm-1 col-1-harf padding-5">
  		<label>ลูกค้า</label>
         <input type="text" class="form-control input-sm" id="s_cus" name="s_cus" value="<?php echo $s_cus; ?>" placeholder="พิมพ์ชื่อลูกค้า" />
     </div>
-    <div class="col-sm-2 padding-5">
+    <div class="col-sm-1 col-1-harf padding-5">
  		<label>พนักงาน</label>
         <input type="text" class="form-control input-sm" id="s_emp" name="s_emp" value="<?php echo $s_emp; ?>" placeholder="พิมพ์ชื่อพนักงาน" />
     </div>
@@ -878,82 +895,131 @@ $('#modal_approve_edit').on('shown.bs.modal', function () {  $('#edit_bill_passw
  		<label style="display:block; visibility:hidden;">&nbsp;</label>
          <button type="button" id="btn-delivered" class="btn btn-sm btn-block <?php echo $dv; ?>" onClick="toggleDelivered()">ยังไม่แจ้งจัดส่ง</button>
     </div>
-    <div class="col-sm-1 padding-5" style="padding-right:15px;">
- 		<label style="display:block; visibility:hidden;">&nbsp;</label>
-        <button type="button" class="btn btn-warning btn-sm btn-block" onClick="clearFilter()">Reset</button>
-    </div>
 
+		<div class="col-sm-1 padding-5">
+ 		<label style="display:block; visibility:hidden;">&nbsp;</label>
+         <button type="button" id="btn-paid" class="btn btn-sm btn-block <?php echo $btn_paid; ?>" onClick="toggleUnPaid()">ยังไม่ชำระเงิน</button>
+    </div>
+		<div class="col-sm-1 padding-5">
+ 		<label style="display:block; visibility:hidden;">&nbsp;</label>
+         <button type="button" id="btn-cod" class="btn btn-sm btn-block <?php echo $btn_cod; ?>" onClick="toggleCODFilter()">COD</button>
+    </div>
 </div>
 <input type="hidden" name="viewType" id="viewType" value="<?php echo $vt; ?>" /><!-- ไว้กำหนดว่า ดูเฉาะฉันหรือทั้งหมด -->
 <input type="hidden" name="closed" id="closed" value="<?php echo $is_closed; ?>" /><!-- กรองเฉพาะตัวที่เปิดบิลแล้วหรือไม่ 0 =ไม่, 1 = เปิดแล้ว -->
 <input type="hidden" name="delivered" id="delivered" value="<?php echo $delivered; ?>" /><!-- บันทึกการจัดส่งไปแล้วหรือยัง 0 = ยัง, 1 = แจ้งแล้ว -->
+<input type="hidden" name="cod" id="cod" value="<?php echo $cod; ?>" /><!-- แสดงเฉพาะ เก็บเงินปลายทาง -->
+<input type="hidden" name="unPaid" id="unPaid" value="<?php echo $unPaid; ?>" />
 </form>
-<hr style='border-color:#CCC; margin-top: 15px; margin-bottom:0px;' />
+<hr style="border-color:#CCC; margin-top: 15px; margin-bottom:0px;" />
 <?php
 //--------------------  เงื่อนไข ------------------//
 	$where = "JOIN tbl_order_online ON tbl_order.id_order = tbl_order_online.id_order WHERE order_status = 1 AND role = 1 AND payment = 'ออนไลน์' ";
-	if( $s_ref != '' OR $s_cus != '' OR $s_emp != '' OR $from != '' )
+
+	createCookie('s_ref', $s_ref);
+	createCookie('s_cus', $s_cus);
+	createCookie('s_emp', $s_emp);
+	createCookie('orderFrom', $from);
+	createCookie('orderTo', $to);
+	createCookie('unPaid', $unPaid);
+	createCookie('isCOD', $cod);
+
+	if( $s_ref != '' )
 	{
-		if( $s_ref != '' )
+		$where .= "AND reference LIKE '%".$s_ref."%' ";
+	}
+
+
+	if( $s_cus != '' )
+	{
+		$in = onlineOrderByCustomer($s_cus);
+		$name_in = onlineCodeByReceiver($s_cus);
+		if( $in !== FALSE OR $name_in !== FALSE)
 		{
-			createCookie('s_ref', $s_ref);
-			$where .= "AND reference LIKE '%".$s_ref."%' ";
-		}
-		if( $s_cus != '' )
-		{
-			createCookie('s_cus', $s_cus);
-			$in = onlineOrderByCustomer($s_cus);
-			if( $in !== FALSE )
+			if($in !== FALSE && $name_in !== FALSE)
+			{
+				$where .= "AND (tbl_order_online.id_order IN(".$in.") OR (tbl_order_online.customer IN(".$name_in."))) ";
+			}
+
+			if($in !== FALSE && $name_in === FALSE)
 			{
 				$where .= "AND tbl_order_online.id_order IN(".$in.") ";
 			}
-			else
+
+			if($in === FALSE && $name_in !== FALSE)
 			{
-				$where .= "AND id_customer = '' ";
+				$where .= "AND tbl_order_online.customer IN(".$name_in.") ";
 			}
+
 		}
-		if( $vt == 0 )
+		else
 		{
-			if( $s_emp != '' )
-			{
-				createCookie('s_emp', $s_emp);
-				$in = employee_in($s_emp);
-				if( $in !== FALSE )
-				{
-					$where .= "AND id_employee IN(".$in.") ";
-				}
-				else
-				{
-					$where .= "AND id_employee = '' ";
-				}
-			}
-		}
-		if( $from != '' )
-		{
-			createCookie('orderFrom', $from);
-			if( $to != '' ){ createCookie('orderTo', $to); }
-			$to	= $to == '' ? toDate($from) : toDate($to);
-			$from = fromDate($from);
-			$where .= "AND ( date_add BETWEEN '".$from."' AND '".$to."' ) ";
+			$where .= "AND id_customer = '' ";
 		}
 	}
+
+
+
+
+
+	if( $vt == 0 )
+	{
+		if( $s_emp != '' )
+		{
+			$in = employee_in($s_emp);
+			if( $in !== FALSE )
+			{
+				$where .= "AND id_employee IN(".$in.") ";
+			}
+			else
+			{
+				$where .= "AND id_employee = '' ";
+			}
+		}
+	}
+
+
+	if( $from != '' && $to != '' )
+	{
+		$where .= "AND date_add >= '".fromDate($from)."' ";
+		$where .= "AND date_add <= '".toDate($to)."' ";
+	}
+
+
 	if( $vt == 1 && getCookie('user_id') !== FALSE )
 	{
 		$where .= "AND id_employee = ".getCookie('user_id')." ";
 	}
+
+
 	if( $is_closed == 1 )
 	{
 		$where .= "AND current_state = 9 ";
 	}
+
+
 	if( $delivered == 1 )  //----- ถ้าต้องการกรองเฉพาะรายการที่ยังไม่แจ้งการจัดส่ง ---//
 	{
 		$where .= "AND delivery_code IS NULL ";
 	}
+
+	if( $unPaid == 1)
+	{
+
+		$where .= "AND tbl_order.valid = 0 ";
+	}
+
+	if($cod == 1)
+	{
+
+		$where .= "AND isCOD = 1 ";
+	}
+
 	$where .= "ORDER BY date_add DESC, tbl_order.id_order DESC";
 //echo $where;
 ?>
-<div class='row'>
-	<div class='col-sm-7'>
+<div class="row">
+	<div class="col-sm-7">
 	<?php	$paginator->Per_Page("tbl_order",$where,$get_rows);	?>
 	<?php	$paginator->display($get_rows,"index.php?content=order_online"); ?>
 	</div>
@@ -968,15 +1034,15 @@ $('#modal_approve_edit').on('shown.bs.modal', function () {  $('#edit_bill_passw
 <div class="col-sm-12">
 		<table class="table" style="border:solid 1px #ccc;">
             <thead>
-                <th style='width:5%; text-align:center;'>ID</th>
-                <th style='width:10%;'>เลขที่อ้างอิง</th>
-                <th style='width:20%;'>ลูกค้า</th>
-                <th style='width:10%;'>พนักงาน</th>
-                <th style='width:10%; text-align:center;'>ยอดเงิน</th>
-                <th style='width:15%; text-align:center;'>การชำระเงิน</th>
-                <th style='width:10%; text-align:center;'>สถานะ</th>
-                <th style='width:10%; text-align:center;'>วันที่เพิ่ม</th>
-                <th style='width:10%; text-align:center;'>วันที่ปรับปรุง</th>
+                <th style="width:5%; text-align:center;">ID</th>
+                <th style="width:15%;">เลขที่อ้างอิง</th>
+                <th style="width:20%;">ลูกค้า</th>
+                <th style="width:10%;">พนักงาน</th>
+                <th style="width:8%; text-align:center;">ยอดเงิน</th>
+                <th style="width:15%; text-align:center;">การชำระเงิน</th>
+                <th style="width:8%; text-align:center;">สถานะ</th>
+                <th style="width:8%; text-align:center;">วันที่เพิ่ม</th>
+                <th style="width:10%; text-align:center;">วันที่ปรับปรุง</th>
             </thead>
 <?php	$qs = dbQuery("SELECT * FROM tbl_order ".$where." LIMIT ".$paginator->Page_Start." , ".$paginator->Per_Page);		?>
 <?php	if( dbNumRows($qs) > 0) :		?>
@@ -990,37 +1056,42 @@ $('#modal_approve_edit').on('shown.bs.modal', function () {  $('#edit_bill_passw
 <?php			$orderAmount = orderAmount($id) + getDeliveryFee($id) + getServiceFee($id);	?>
 <?php			if( $order->valid != 2 ) : ?>
 			<?php	if( !$isClosed ) : ?>
-			<tr style='color:#FFF; background-color:<?php echo state_color($order->current_state); ?>; font-size:12px;'>
+			<tr style="color:#FFF; background-color:<?php echo state_color($order->current_state); ?>; font-size:12px;">
             <?php 	else : ?>
-            <tr style='color:#555; background-color:#E6E9ED; font-size:12px;'>
+            <tr style="color:#555; background-color:#E6E9ED; font-size:12px;">
             <?php	endif;	?>
-				<td align='center' style='cursor:pointer;' onclick="viewOrder(<?php echo $id; ?>)"><?php echo $id; ?></td>
-				<td style='cursor:pointer;' onclick="viewOrder(<?php echo $id; ?>)"><?php echo $order->reference; ?></td>
-				<td style='cursor:pointer;' onclick="viewOrder(<?php echo $id; ?>)"><?php echo $customer; ?></td>
-				<td style='cursor:pointer;' onclick="viewOrder(<?php echo $id; ?>)"><?php echo employee_name($order->id_employee); ?></td>
-				<td align='center' style='cursor:pointer;' onclick="viewOrder(<?php echo $id; ?>)"><?php echo number_format($orderAmount); ?></td>
-				<td align='center' style='cursor:pointer;' onclick="viewOrder(<?php echo $id; ?>)"><?php echo $order->payment; ?></td>
-				<td align='center' style='cursor:pointer;' onclick="viewOrder(<?php echo $id; ?>)"><?php echo $order->current_state_name; ?></td>
-				<td align='center' style='cursor:pointer;' onclick="viewOrder(<?php echo $id; ?>)"><?php echo thaiDate($order->date_add); ?></td>
-				<td align='center' style='cursor:pointer;' onclick="viewOrder(<?php echo $id; ?>)"><?php echo thaiDate($order->date_upd); ?></td>
+				<td align="center" style="cursor:pointer;" onclick="viewOrder(<?php echo $id; ?>)"><?php echo $id; ?></td>
+				<td style="cursor:pointer;" onclick="viewOrder(<?php echo $id; ?>)">
+						<?php echo $order->reference; ?>
+						<?php if($order->isCOD == 1 && $order->valid == 0) : ?>
+							<span class="label label-danger">รอเงินเข้า</span>
+						<?php endif; ?>
+				</td>
+				<td style="cursor:pointer;" onclick="viewOrder(<?php echo $id; ?>)"><?php echo $customer; ?></td>
+				<td style="cursor:pointer;" onclick="viewOrder(<?php echo $id; ?>)"><?php echo employee_name($order->id_employee); ?></td>
+				<td align="center" style="cursor:pointer;" onclick="viewOrder(<?php echo $id; ?>)"><?php echo number_format($orderAmount); ?></td>
+				<td align="center" style="cursor:pointer;" onclick="viewOrder(<?php echo $id; ?>)"><?php echo ($order->isCOD == 1 ? 'เก็บเงินปลายทาง' : $order->payment); ?></td>
+				<td align="center" style="cursor:pointer;" onclick="viewOrder(<?php echo $id; ?>)"><?php echo $order->current_state_name; ?></td>
+				<td align="center" style="cursor:pointer;" onclick="viewOrder(<?php echo $id; ?>)"><?php echo thaiDate($order->date_add); ?></td>
+				<td align="center" style="cursor:pointer;" onclick="viewOrder(<?php echo $id; ?>)"><?php echo thaiDate($order->date_upd); ?></td>
 			</tr>
 <?php			else : ?>
-			<tr style='color:#FFF; background-color:#434A54; font-size:12px;'>
-				<td align='center'><?php echo $id; ?></td>
+			<tr style="color:#FFF; background-color:#434A54; font-size:12px;">
+				<td align="center"><?php echo $id; ?></td>
 				<td><?php echo $order->reference; ?></td>
 				<td><?php echo $customer; ?></td>
 				<td><?php echo employee_name($order->id_employee); ?></td>
-				<td align='center'><?php echo number_format(orderAmount($id)); ?></td>
-				<td align='center'><?php echo $order->payment; ?></td>
-				<td align='center'><?php echo $order->current_state_name; ?></td>
-				<td align='center'><?php echo thaiDate($order->date_add); ?></td>
-				<td align='center'><?php echo thaiDate($order->date_upd); ?></td>
+				<td align="center"><?php echo number_format(orderAmount($id)); ?></td>
+				<td align="center"><?php echo $order->payment; ?></td>
+				<td align="center"><?php echo $order->current_state_name; ?></td>
+				<td align="center"><?php echo thaiDate($order->date_add); ?></td>
+				<td align="center"><?php echo thaiDate($order->date_upd); ?></td>
 			</tr>
 
 <?php			endif;	?>
 <?php	endwhile; ?>
 <?php else : ?>
-			<tr><td colspan='9' align='center'><h4>ไม่พบรายการตามเงื่อนไขที่กำหนด</h4></td></tr>
+			<tr><td colspan="9" align="center"><h4>ไม่พบรายการตามเงื่อนไขที่กำหนด</h4></td></tr>
 <?php endif; ?>
 		</table>
 <?php 	echo $paginator->display_pages(); ?>
@@ -1028,17 +1099,17 @@ $('#modal_approve_edit').on('shown.bs.modal', function () {  $('#edit_bill_passw
 <script>  var x = setTimeout(function () { location.reload(); }, 60 * 5000); </script>
 	</div><!--/ col-sm-12 -->
 </div><!--/ row -->
-<div class='modal fade' id='order_grid' tabindex='-1' role='dialog' aria-labelledby='myModalLabel' aria-hidden='true'>
-    <div class='modal-dialog' id='modal'>
-        <div class='modal-content'>
-            <div class='modal-header'>
-                <button type='button' class='close' data-dismiss='modal' aria-hidden='true'>&times;</button>
-                <h4 class='modal-title' id='modal_title'></h4>
+<div class="modal fade" id="order_grid" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog" id="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title" id="modal_title"></h4>
                 <center><span style="color: red;">ใน ( ) = ยอดคงเหลือทั้งหมด   ไม่มีวงเล็บ = สั่งได้ทันที</span></center>
             </div>
-            <div class='modal-body' id='modal_body'></div>
-            <div class='modal-footer'>
-                <button type='button' class='btn btn-default' data-dismiss='modal'>ปิด</button>
+            <div class="modal-body" id="modal_body"></div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">ปิด</button>
             </div>
         </div>
     </div>
@@ -1046,31 +1117,31 @@ $('#modal_approve_edit').on('shown.bs.modal', function () {  $('#edit_bill_passw
 <?php endif; ?>
 </div><!--/ Container -->
 
-<div class='modal fade' id='confirmModal' tabindex='-1' role='dialog' aria-labelledby='myModalLabel' aria-hidden='true'>
-    <div class='modal-dialog' style="width:350px;">
-        <div class='modal-content'>
-            <div class='modal-header'>
-                <button type='button' class='close' data-dismiss='modal' aria-hidden='true'>&times;</button>
+<div class="modal fade" id="confirmModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog" style="width:350px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
             </div>
-            <div class='modal-body' id="detailBody">
+            <div class="modal-body" id="detailBody">
 
             </div>
-            <div class='modal-footer'>
+            <div class="modal-footer">
             </div>
         </div>
     </div>
 </div>
 
-<div class='modal fade' id='imageModal' tabindex='-1' role='dialog' aria-labelledby='myModalLabel' aria-hidden='true'>
-    <div class='modal-dialog' style="width:500px;">
-        <div class='modal-content'>
-            <div class='modal-header'>
-                <button type='button' class='close' data-dismiss='modal' aria-hidden='true'><i class="fa fa-times"></i></button>
+<div class="modal fade" id="imageModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog" style="width:500px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true"><i class="fa fa-times"></i></button>
             </div>
-            <div class='modal-body' id="imageBody">
+            <div class="modal-body" id="imageBody">
 
             </div>
-            <div class='modal-footer'>
+            <div class="modal-footer">
             </div>
         </div>
     </div>

@@ -333,7 +333,7 @@ function getFinalPrice($price, $p_dis, $a_dis)
 function getOnlineAddress($id_order)
 {
 	$sc = FALSE;
-	$code = 	getCustomerOnlineReference($id_order);
+	$code = 	addslashes(getCustomerOnlineReference($id_order));
 	if( $code != '' )
 	{
 		$qs = dbQuery("SELECT * FROM tbl_address_online WHERE customer_code = '".$code."'");
@@ -359,7 +359,7 @@ function isAddressExists($code)
 function getDefaultOnlineAddress($id_order)
 {
 	$sc = FALSE;
-	$code = 	getCustomerOnlineReference($id_order);
+	$code = 	addslashes(getCustomerOnlineReference($id_order));
 	if( $code != '' )
 	{
 		$qs = dbQuery("SELECT * FROM tbl_address_online WHERE customer_code = '".$code."' AND is_default = 1");

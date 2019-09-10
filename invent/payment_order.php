@@ -75,9 +75,10 @@ $toDate = getFilter('toDate', 'toDate', '');
 
 	$where .= "ORDER BY p.date_add DESC";
 
-	$qx = "SELECT p.*, o.reference, o.id_employee FROM ";
+	$qx = "SELECT p.*, o.reference, o.id_employee, ol.customer FROM ";
 	$qr = "tbl_payment AS p ";
 	$qr .= "LEFT JOIN tbl_order AS o ON p.id_order = o.id_order ";
+	$qr .= "LEFT JOIN tbl_order_online AS ol ON o.id_order = ol.id_order ";
 
 	$paginator	= new paginator();
 	$get_rows	= get_rows();
@@ -111,7 +112,7 @@ $toDate = getFilter('toDate', 'toDate', '');
 		        <td class="text-center"><?php echo $no; ?></td>
 						<td class="text-center"><?php echo thaiDate($rs->date_add); ?></td>
 		        <td><?php echo $rs->reference; ?></td>
-		        <td><?php echo onlineCustomerName($rs->id_order); ?></td>
+		        <td><?php echo $rs->customer; ?></td>
 		        <td class="text-center"><?php echo number_format($rs->order_amount, 2); ?></td>
 		        <td class="text-center"><?php echo number_format($rs->pay_amount, 2); ?></td>
 		        <td class="text-center"><?php echo $bank['acc_no']; ?></td>
@@ -451,7 +452,7 @@ function reloadOrderTable()
 				var output	= $("#orderTable");
 				render(source, data, output);
 			}else{
-				$("#orderTable").html('<tr><td colspan="9" align="center"><strong>ไม่พบรายการรอตรวจสอบ</strong></td></tr>');
+				$("#orderTable").html('<tr><td colspan="11" align="center"><strong>ไม่พบรายการรอตรวจสอบ</strong></td></tr>');
 			}
 		}
 	});

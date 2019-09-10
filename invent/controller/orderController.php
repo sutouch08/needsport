@@ -168,7 +168,7 @@ if( isset( $_GET['addOnlineAddress'] ) )
 	$sc = 'fail';
 	$id_order 	= $_GET['id_order'];
 	$id_address = $_POST['id_address'] == '' ? FALSE : $_POST['id_address'];
-	$code		= getCustomerOnlineReference($id_order);
+	$code		= addslashes(getCustomerOnlineReference($id_order));
 	$isExists		= isAddressExists($code);
 	if( $code !== FALSE )
 	{
@@ -307,7 +307,8 @@ if( isset( $_GET['addNewOrder'] ) )
 						"valid"				=> 0,
 						"role"				=> $_POST['role'],
 						"date_add"		=> $date_add,
-						"id_channels" => $_POST['channels']
+						"id_channels" => $_POST['channels'],
+						"isCOD"	=> $_POST['isCOD']
 						);
 	$order = new order();
 	$rs = $order->add($data);
@@ -336,6 +337,7 @@ if( isset( $_GET['updateEditOrderHeader'] ) )
 						"id_employee"	=> $_POST['id_employee'],
 						"payment"		=> $_POST['payment'],
 						"id_channels" => $_POST['channels'],
+						"isCOD" => $_POST['isCOD'],
 						"comment"		=> $_POST['comment'],
 						"date_add"		=> dbDate($_POST['doc_date'], true)
 							);
@@ -1416,7 +1418,15 @@ if( isset( $_GET['print_order']) && isset( $_GET['id_order'] ) )
 	$doc			= doc_type($order->role);
 	echo $print->doc_header();
 	$print->add_title($doc['title']);
-	$header		= array("ลูกค้า"=>customer_name($order->id_customer), "วันที่"=>thaiDate($order->date_add), "พนักงานขาย"=>sale_name($order->id_sale), "เลขที่เอกสาร"=>$order->reference);
+	$onlineCustomer = getCustomerOnlineReference($id_order);
+	$cusName = $onlineCustomer == '' ? customer_name($order->id_customer) : customer_name($order->id_customer).' ['.$onlineCustomer.']';
+	$header		= array(
+		"ลูกค้า"=>$cusName,
+		"วันที่"=>thaiDate($order->date_add),
+		"พนักงานขาย"=>sale_name($order->id_sale),
+		"เลขที่เอกสาร"=>$order->reference
+	);
+
 	$print->add_header($header);
 	$detail 		= dbQuery("SELECT * FROM tbl_order_detail WHERE id_order = ".$id_order);
 	$total_row 	= dbNumRows($detail);
@@ -1473,7 +1483,7 @@ if( isset( $_GET['print_order']) && isset( $_GET['id_order'] ) )
 				$product = new product();
 				while($i<$row) :
 					$rs = dbFetchArray($detail);
-					if(count($rs) != 0) :
+					if(!empty($rs)) :
 
 						$barcode			= "<img src='".WEB_ROOT."library/class/barcode/barcode.php?text=".$rs['barcode']."' style='height:8mm;' />";
 						$product_name 	= "<input type='text' style='border:0px; width:100%;' value='".$product->product_reference($rs['id_product_attribute'])." : ".$product->product_name($rs['id_product'])."' />";

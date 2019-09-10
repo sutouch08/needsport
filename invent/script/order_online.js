@@ -1,4 +1,56 @@
 // JavaScript Document
+function toggleCOD()
+{
+	var i = $('#isCOD').val();
+	if(i == 1){
+		$('#isCOD').val(0);
+		$('#btn-cod').removeClass('btn-success');
+		$('#btn-cod').html('เก็บเงินปลายทาง');
+		return;
+	}
+
+	if(i == 0){
+		$('#isCOD').val(1);
+		$('#btn-cod').addClass('btn-success');
+		$('#btn-cod').html('<i class="fa fa-check"></i> เก็บเงินปลายทาง');
+		return;
+	}
+}
+
+
+
+function toggleUnPaid()
+{
+	var i = $('#unPaid').val();
+	if(i == 1){
+		$('#unPaid').val(0);
+		getSearch();
+		return;
+	}
+
+	if(i == 0){
+		$('#unPaid').val(1);
+		getSearch();
+		return;
+	}
+}
+
+function toggleCODFilter()
+{
+	var i = $('#cod').val();
+	if(i == 1){
+		$('#cod').val(0);
+		getSearch();
+		return;
+	}
+
+	if(i == 0){
+		$('#cod').val(1);
+		getSearch();
+		return;
+	}
+}
+
 
 function saveService()
 {
@@ -909,6 +961,7 @@ function editOrder()
 	$("#payment").removeAttr("disabled");
 	$("#online").removeAttr("disabled");
 	$('#channels').removeAttr('disabled');
+	$("#btn-cod").removeAttr("disabled");
 	$("#comment").removeAttr("disabled");
 	$("#btnEdit").css("display","none");
 	$("#btnUpdate").css("display", "");

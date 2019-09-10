@@ -540,6 +540,15 @@ if( isset( $_GET['printOnlineAddressSheet'] ) && isset( $_GET['id_address'] ) )
 	$sender			.= '</div>';
 	/********* / Sender *************/
 
+	$cod = '';
+	if($order->isCOD == 1)
+	{
+		$orderAmount = orderAmount($id_order) - bill_discount($id_order) + getDeliveryFee($id_order) + getServiceFee($id_order);
+		$cod .= '<div class="col-sm-12" style="font-size:35px; text-align:center; vertical-align:text-middle; font-weight: bold;">';
+		$cod .= 'COD  : '.number($orderAmount).'.-';
+		$cod .= '</div>';
+	}
+
 	/*********** Receiver  **********/
 	$receiver		= '<div class="col-sm-12" style="font-size:24px; border:solid 2px #ccc; border-radius:10px; padding:10px;">';
 	$receiver		.= '<span style="display:block; font-size: 20px; font-weight:bold; padding-bottom:10px; border-bottom:solid 2px #ccc; margin-bottom:15px;">ผู้รับ &nbsp; |  &nbsp; ';
@@ -636,16 +645,19 @@ if( isset( $_GET['printOnlineAddressSheet'] ) && isset( $_GET['id_address'] ) )
 	$printer = new printer();
 	$config = array("row" => 13, "total_row" => 1, "header_row" => 0, "footer_row" => 0, "sub_total_row" => 0, "content_border" => 0);
 	$printer->config($config);
-	$barcode	= "<img src='".WEB_ROOT."library/class/barcode/barcode.php?text=".$order->reference."' style='height:15mm; margin-bottom:10px;' />";
+	$barcode	= "<img src='".WEB_ROOT."library/class/barcode/barcode.php?text=".$order->reference."' style='height:15mm;' />";
 	$Page .= $printer->doc_header();
 	$Page .= $printer->page_start();
 	$Page .= $printer->content_start();
 	$Page .= '<table style="width:100%; border:0px;">';
 	$Page .= 	'<tr>';
-	$Page .= 		'<td rowspan="2" valign="top" style="width:40%; padding:10px;">'.$sender.'</td>';
-	$Page .=		'<td valign="top" align="center" style="padding:10px;">'.$barcode.'</td>';
+	$Page .= 		'<td valign="top" style="width:40%; padding:10px;">'.$sender.'</td>';
+	$Page .=			'<td valign="top" style="padding:10px;">'.$receiver.'</td>';
 	$Page .= 	'</tr>';
-	$Page	 .= 	'<tr><td style="padding:10px;">'.$receiver.'</td></tr>';
+	$Page	.= 	'<tr>';
+	$Page .= 		'<td>'.$cod.'</td>';
+	$Page .= 		'<td style="padding:10px;">'.$barcode.'</td>';
+	$Page .= 	'</tr>';
 	$Page .= '</table>';
 	$Page .= '<hr style="border: 1px dashed #ccc;" />';
 	$Page .= '<div class="row">';
