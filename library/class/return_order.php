@@ -1,4 +1,4 @@
-<?php 
+<?php
 class return_order{
 public $id_return_order;
 public $reference;
@@ -53,7 +53,7 @@ public function get_data($id)
 	$this->date_add 			= $ro['date_add'];
 	$this->date_upd 			= $ro['date_upd'];
 	$this->remark 				= $ro['remark'];
-	$this->status 				= $ro['status'];	
+	$this->status 				= $ro['status'];
 }
 
 public function add(array $data){
@@ -99,16 +99,16 @@ public function add_item($id_return_order, array $data)
 		$id_product = $product->getProductId($rs['id_product_attribute']);
 		$product_name = $product->product_reference($rs['id_product_attribute'])." : ".$product->product_name($id_product);
 		$rd = array(
-						"id"=>$rs['id_return_order_detail'], 
-						"product"=>$product_name, 
+						"id"=>$rs['id_return_order_detail'],
+						"product"=>$product_name,
 						"qty"=>$qty,
-						"zone"=>get_zone($rs['id_zone']), 
-						"order_reference"=>$rs['order_reference'], 
+						"zone"=>get_zone($rs['id_zone']),
+						"order_reference"=>$rs['order_reference'],
 						"date_add"=>thaiDateTime($rs['date_add']),
 						"status"=>$rs['status']
 						);
 	}else{
-		$rd = false;	
+		$rd = false;
 	}
 	return $rd;
 }
@@ -148,20 +148,20 @@ public function add_item2($id_return_order, array $data)
 		$id_product = $product->getProductId($rs['id_product_attribute']);
 		$product_name = $product->product_reference($rs['id_product_attribute'])." : ".$product->product_name($id_product);
 		$rd = array(
-						"id"=>$rs['id_return_order_detail'], 
-						"product"=>$product_name, 
+						"id"=>$rs['id_return_order_detail'],
+						"product"=>$product_name,
 						"qty"=>$qty,
 						"price"=>$rs['product_price'],
 						"percent"=>$rs['reduction_percent'],
 						"amount"=>$rs['reduction_amount'],
 						"total_amount"=>$rs['total_amount'],
-						"zone"=>get_zone($rs['id_zone']), 
-						"order_reference"=>$rs['order_reference'], 
+						"zone"=>get_zone($rs['id_zone']),
+						"order_reference"=>$rs['order_reference'],
 						"date_add"=>thaiDate($rs['date_add']),
 						"status"=>$rs['status']
 						);
 	}else{
-		$rd = false;	
+		$rd = false;
 	}
 	return $rd;
 }
@@ -191,14 +191,14 @@ public function delete_row($id_return_order_detail)
 			/// ลบ movement
 			$movement = dbQuery("DELETE FROM tbl_stock_movement WHERE reference = '".$this->reference."' AND id_product_attribute = ".$item['id_product_attribute']." AND id_zone = ".$item['id_zone']);
 			if($movement)
-			{	
+			{
 				return dbQuery("DELETE FROM tbl_return_order_detail WHERE id_return_order_detail = ".$id_return_order_detail);
 			}
 		}else{
 			return false;
 		}
 	}else{
-		return dbQuery("DELETE FROM tbl_return_order_detail WHERE id_return_order_detail = ".$id_return_order_detail);	
+		return dbQuery("DELETE FROM tbl_return_order_detail WHERE id_return_order_detail = ".$id_return_order_detail);
 	}
 }
 
@@ -214,7 +214,7 @@ public function update($id_return_order, array $data)
 		if($i<$n){ $sql .= ", "; }
 		$i++;
 	}
-	return dbQuery("UPDATE tbl_return_order SET ".$sql." WHERE id_return_order = ".$id_return_order);	
+	return dbQuery("UPDATE tbl_return_order SET ".$sql." WHERE id_return_order = ".$id_return_order);
 }
 
 public function total_return($id_return_order)
@@ -241,7 +241,7 @@ public function return_detail($id_return_order, $status = '')
 	{
 		return dbQuery("SELECT * FROM tbl_return_order_detail WHERE id_return_order = ".$id_return_order." AND status = ".$status);
 	}else{
-		return dbQuery("SELECT * FROM tbl_return_order_detail WHERE id_return_order = ".$id_return_order);	
+		return dbQuery("SELECT * FROM tbl_return_order_detail WHERE id_return_order = ".$id_return_order);
 	}
 }
 
@@ -250,7 +250,7 @@ public function insert_stock($id_product_attribute, $id_zone, $qty)
 	$qs = dbQuery("SELECT qty FROM tbl_stock WHERE id_product_attribute = ".$id_product_attribute." AND id_zone = ".$id_zone);
 	if(dbNumRows($qs) == 1 )
 	{
-		$qr	= dbQuery("UPDATE tbl_stock SET qty = qty + ".$qty." WHERE id_product_attribute = ".$id_product_attribute." AND id_zone = ".$id_zone);	
+		$qr	= dbQuery("UPDATE tbl_stock SET qty = qty + ".$qty." WHERE id_product_attribute = ".$id_product_attribute." AND id_zone = ".$id_zone);
 	}else{
 		$qr	= dbQuery("INSERT INTO tbl_stock (id_zone, id_product_attribute, qty) VALUES (".$id_zone.", ".$id_product_attribute.", ".$qty.")");
 	}
@@ -267,7 +267,7 @@ public function set_item_status($id_return_order_detail, $status)
 public function set_return_status($id_return_order, $status)
 {
 	$qs = dbQuery("UPDATE tbl_return_order SET status = ".$status." WHERE id_return_order = ".$id_return_order);
-	return $qs;	
+	return $qs;
 }
 
 public function drop_data($id_return_order, $status = 1)
@@ -276,7 +276,7 @@ public function drop_data($id_return_order, $status = 1)
 	$qs	= $this->return_detail($id_return_order, $status);  //// เอาเฉพาะรายการที่ 1 = บันทึกแล้ว 0 = ยังไม่บันทึก  '' = ทุกรายการ
 	if( dbNumRows($qs) > 0 )
 	{
-		while( $rs = dbFetchArray($qs) )	
+		while( $rs = dbFetchArray($qs) )
 		{
 			////// ลดสต็อก
 			$stock = $this->insert_stock($rs['id_product_attribute'], $rs['id_zone'], $rs['qty']*(-1));
@@ -297,7 +297,7 @@ public function drop_all_detail($id_return_order)
 
 public function drop_return($id_return_order)
 {
-	return dbQuery("DELETE FROM tbl_return_order WHERE id_return_order = ".$id_return_order);	
+	return dbQuery("DELETE FROM tbl_return_order WHERE id_return_order = ".$id_return_order);
 }
 
 
@@ -316,12 +316,12 @@ public function save_add()
 			$detail = $this->get_sold_detail($rs['order_reference'], $rs['id_product_attribute']);
 			$total_amount = $rs['qty']*$detail['final_price'];
 			$sql = "UPDATE tbl_return_order_detail SET product_price = ".$detail['product_price'].", reduction_percent = ".$detail['reduction_percent'].", reduction_amount = ".$detail['reduction_amount'].", final_price = ".$detail['final_price'];
-			$sql .= ", total_amount = ".$total_amount.", id_customer = ".$this->id_customer.", id_sale = ".$this->id_sale.", id_employee = ".$this->id_employee." WHERE id_return_order_detail = ".$rs['id_return_order_detail']; 
-			if(dbQuery($sql) )  //// 
+			$sql .= ", total_amount = ".$total_amount.", id_customer = ".$this->id_customer.", id_sale = ".$this->id_sale.", id_employee = ".$this->id_employee." WHERE id_return_order_detail = ".$rs['id_return_order_detail'];
+			if(dbQuery($sql) )  ////
 			{
 				if( $this->insert_stock($rs['id_product_attribute'], $rs['id_zone'], $rs['qty']) )
 				{
-					$sm = stock_movement("in", 1, $rs['id_product_attribute'], get_warehouse_by_zone($rs['id_zone']), $rs['qty'], $this->reference, $this->date_add, $rs['id_zone']);	
+					$sm = stock_movement("in", 1, $rs['id_product_attribute'], get_warehouse_by_zone($rs['id_zone']), $rs['qty'], $this->reference, now(), $rs['id_zone']);
 					if($sm)
 					{
 						$this->set_item_status($rs['id_return_order_detail'], 1); //// update_status
@@ -333,7 +333,7 @@ public function save_add()
 				}
 			}else{
 				$result = false;
-			}			
+			}
 		}/// endwhile;
 		if( $result ){ 	$this->set_return_status($this->id_return_order, 1); }
 	}/// endif;
@@ -354,7 +354,7 @@ public function save_add2()
 			$product->product_attribute_detail($rs['id_product_attribute']);
 			if( $this->insert_stock($rs['id_product_attribute'], $rs['id_zone'], $rs['qty']) )
 			{
-				$sm = stock_movement("in", 1, $rs['id_product_attribute'], get_warehouse_by_zone($rs['id_zone']), $rs['qty'], $this->reference, $this->date_add, $rs['id_zone']);	
+				$sm = stock_movement("in", 1, $rs['id_product_attribute'], get_warehouse_by_zone($rs['id_zone']), $rs['qty'], $this->reference, now(), $rs['id_zone']);
 				if($sm)
 				{
 					$this->set_item_status($rs['id_return_order_detail'], 1); //// update_status
@@ -363,7 +363,7 @@ public function save_add2()
 				}
 			}else{
 				$result = false;
-			}		
+			}
 		}/// endwhile;
 		if( $result ){ 	$this->set_return_status($this->id_return_order, 1); }
 	}/// endif;
@@ -400,11 +400,11 @@ public function select_last_item_order($id_product_attribute, $id_customer, $ref
 	if(dbNumRows($qs) > 0 )
 	{
 		while($rs = dbFetchArray($qs) )
-		{	
+		{
 			$returned = $this->item_returned($id_product_attribute, $rs['reference']);
 			$qty	= $rs['sold_qty'] - $returned;
 			if( $rs['reduction_percent'] > 0 ){ $discount = $rs['reduction_percent']." %"; }else if($rs['reduction_amount'] > 0){ $discount = $rs['reduction_amount']." ฿"; }else{ $discount = 0.00; }
-			if($reference == $rs['reference']){ 
+			if($reference == $rs['reference']){
 				$qty += $this->returned_qty($id_return_order_detail);
 				$option .= "<option value='".$rs['reference']." : ".$qty."' selected >".$rs['reference']." : ".$qty." : ".$discount."</option>";
 			}else{

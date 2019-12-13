@@ -2794,7 +2794,7 @@ function order_sold($id_order)
 	$id_sale	= get_id_sale_by_customer($id_cus);
 	$role		= $order->role;
 	$id_emp	= $order->id_employee;
-	$date_upd = dbDate($order->date_add, TRUE);
+	$date_upd = date('Y-m-d H:i:s'); //dbDate($order->date_add, TRUE);
 
 	$result	= TRUE;
 

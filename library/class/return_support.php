@@ -51,7 +51,7 @@ public function get_data($id)
 public function add(array $data)
 {
 	$sql = "INSERT INTO tbl_return_support (reference, order_reference, id_employee, date_add, remark, status ) VALUES ";
-	$sql .= "('".$data['reference']."', '".$data['order_reference']."', ".$data['id_employee'].", '".$data['date_add']."', '".$data['remark']."', ".$data['status'].")";	
+	$sql .= "('".$data['reference']."', '".$data['order_reference']."', ".$data['id_employee'].", '".$data['date_add']."', '".$data['remark']."', ".$data['status'].")";
 	$qs = dbQuery($sql);
 	if($qs)
 	{
@@ -78,7 +78,7 @@ public function update($id_return_support, array $data)
 			if($qa)
 			{
 				$qs = "UPDATE tbl_return_support SET order_reference = '".$data['order_reference']."', id_employee = ".$data['id_employee'].", ";
-				$qs .= "date_add = '".$data['date_add']."', remark = '".$data['remark']."' WHERE id_return_support = ".$id_return_support;	
+				$qs .= "date_add = '".$data['date_add']."', remark = '".$data['remark']."' WHERE id_return_support = ".$id_return_support;
 				$rs = dbQuery($qs);
 				if($rs)
 				{
@@ -88,12 +88,12 @@ public function update($id_return_support, array $data)
 		}
 	}
 	return $res;
-}	
+}
 
 public function drop_return($id_return_support)
 {
 	$qs = dbQuery("DELETE FROM tbl_return_support WHERE id_return_support = ".$id_return_support);
-	return $qs;	
+	return $qs;
 }
 
 
@@ -115,7 +115,7 @@ public function drop_all_detail($id_return_support)
 public function drop_detail($id_return_support_detail)
 {
 	$qs = dbQuery("DELETE FROM tbl_return_support_detail WHERE id_return_support_detail = ".$id_return_support_detail);
-	return $qs;	
+	return $qs;
 }
 
 public function add_item($id_return_support, array $data)
@@ -130,7 +130,7 @@ public function add_item($id_return_support, array $data)
 	{
 		$qr = dbQuery("UPDATE tbl_return_support_detail SET qty = qty + ".$qty." WHERE id_return_support = ".$id_return_support." AND id_product_attribute = ".$id_product_attribute." AND id_zone = ".$id_zone);
 	}else{
-		$qr = dbQuery("INSERT INTO tbl_return_support_detail ( id_return_support, id_product_attribute, qty, id_zone, date_add, status) VALUES (".$id_return_support.", ".$id_product_attribute.", ".$qty.", ".$id_zone.", NOW(), 0 )");	
+		$qr = dbQuery("INSERT INTO tbl_return_support_detail ( id_return_support, id_product_attribute, qty, id_zone, date_add, status) VALUES (".$id_return_support.", ".$id_product_attribute.", ".$qty.", ".$id_zone.", NOW(), 0 )");
 	}
 	if($qr)
 	{
@@ -140,18 +140,18 @@ public function add_item($id_return_support, array $data)
 		$id_product = $product->getProductId($rs['id_product_attribute']);
 		$product_name = $product->product_reference($rs['id_product_attribute'])." : ".$product->product_name($id_product);
 		$rs = array(
-						"id"=>$rs['id_return_support_detail'], 
-						"product"=>$product_name, 
+						"id"=>$rs['id_return_support_detail'],
+						"product"=>$product_name,
 						"qty"=>$qty,
-						"zone"=>get_zone($rs['id_zone']), 
-						"wh"=>get_warehouse_name_by_id(get_warehouse_by_zone($rs['id_zone'])), 
+						"zone"=>get_zone($rs['id_zone']),
+						"wh"=>get_warehouse_name_by_id(get_warehouse_by_zone($rs['id_zone'])),
 						"date_add"=>thaiDateTime($rs['date_add']),
 						"status"=>$rs['status']
 						);
 	}else{
 		$rs = false;
 	}
-	return $rs;	
+	return $rs;
 }
 
 public function sum_item($id_return_support)
@@ -170,7 +170,7 @@ public function sum_item($id_return_support)
 						"product"=>$product_name,
 						"qty"=>$rs['qty'],
 						"zone"=>get_zone($rs['id_zone']),
-						"wh"=>get_warehouse_name_by_id(get_warehouse_by_zone($rs['id_zone'])), 
+						"wh"=>get_warehouse_name_by_id(get_warehouse_by_zone($rs['id_zone'])),
 						"date_add"=>thaiDateTime($rs['date_add']),
 						"status"=>$rs['status'] == 1 ? true : false
 						);
@@ -179,14 +179,14 @@ public function sum_item($id_return_support)
 	}else{
 		$data = false;
 	}
-	
+
 	return $data;
 }
 
 public function delete_item($id_return_support_detail)
 {
 	$qs = dbQuery("DELETE FROM tbl_return_support_detail WHERE id_return_support_detail = ".$id_return_support_detail);
-	return $qs;	
+	return $qs;
 }
 
 public function total_return($id_return_support)
@@ -204,7 +204,7 @@ public function total_return($id_return_support)
 public function return_detail($id_return_support)
 {
 	$qs = dbQuery("SELECT * FROM tbl_return_support_detail WHERE id_return_support = ".$id_return_support);
-	return $qs;	
+	return $qs;
 }
 
 public function item_not_save($id_return_support)
@@ -216,7 +216,7 @@ public function item_not_save($id_return_support)
 public function item_saved($id_return_support)
 {
 	$qs = dbQuery("SELECT * FROM tbl_return_support_detail WHERE id_return_support = ".$id_return_support." AND status = 1");
-	return $qs;	
+	return $qs;
 }
 
 public function set_item_status($id_return_support_detail, $status)
@@ -228,7 +228,7 @@ public function set_item_status($id_return_support_detail, $status)
 public function set_return_status($id_return_support, $status)
 {
 	$qs = dbQuery("UPDATE tbl_return_support SET status = ".$status." WHERE id_return_support = ".$id_return_support);
-	return $qs;	
+	return $qs;
 }
 
 /////////  เพิ่มรายการลงใน order_detail_sold //////
@@ -243,7 +243,7 @@ public function insert_stock($id_product_attribute, $id_zone, $qty)
 	$qs = dbQuery("SELECT qty FROM tbl_stock WHERE id_product_attribute = ".$id_product_attribute." AND id_zone = ".$id_zone);
 	if(dbNumRows($qs) == 1 )
 	{
-		$qr	= dbQuery("UPDATE tbl_stock SET qty = qty + ".$qty." WHERE id_product_attribute = ".$id_product_attribute." AND id_zone = ".$id_zone);	
+		$qr	= dbQuery("UPDATE tbl_stock SET qty = qty + ".$qty." WHERE id_product_attribute = ".$id_product_attribute." AND id_zone = ".$id_zone);
 	}else{
 		$qr	= dbQuery("INSERT INTO tbl_stock (id_zone, id_product_attribute, qty) VALUES (".$id_zone.", ".$id_product_attribute.", ".$qty.")");
 	}
@@ -263,10 +263,10 @@ public function save_add()
 			$product = new product();
 			$id_product = $product->getProductId($rs['id_product_attribute']);
 			$product->product_detail($id_product);
-			$product->product_attribute_detail($rs['id_product_attribute']);			
+			$product->product_attribute_detail($rs['id_product_attribute']);
 				if( $this->insert_stock($rs['id_product_attribute'], $rs['id_zone'], $rs['qty']) )
 				{
-					$sm = stock_movement("in", 1, $rs['id_product_attribute'], get_warehouse_by_zone($rs['id_zone']), $rs['qty'], $this->reference, $this->date_add, $rs['id_zone']);	
+					$sm = stock_movement("in", 1, $rs['id_product_attribute'], get_warehouse_by_zone($rs['id_zone']), $rs['qty'], $this->reference, now(), $rs['id_zone']);	
 					if($sm)
 					{
 						$this->set_item_status($rs['id_return_support_detail'], 1); //// update_status
@@ -281,7 +281,7 @@ public function save_add()
 					}
 				}else{
 					$result = false;
-				}	
+				}
 		}/// endwhile;
 		if( $result ){ 	$this->set_return_status($this->id_return_support, 1); }
 	}/// endif;
@@ -290,12 +290,12 @@ public function save_add()
 
 public function drop_data()
 {
-	///  1. ลด budget	
+	///  1. ลด budget
 	$amount = $this->total_return_amount($this->reference);
 	$id_order	= $this->get_id_order_by_reference($this->order_reference, 7);
 	$id_budget 	= $this->get_id_budget_by_id_order($id_order);
 	$qm = dbQuery("UPDATE tbl_support_budget SET balance = balance + ".$amount." WHERE id_support_budget = ".$id_budget);
-	
+
 	///  2. ลบ movement
 	if($qm)
 	{
@@ -306,20 +306,20 @@ public function drop_data()
 			$qty 	= $rm['move_in'] * (-1);
 			$ra = $this->insert_stock($rm['id_product_attribute'], $rm['id_zone'], $qty);
 			if($ra)
-			{ 
-				$ro = dbQuery("DELETE FROM tbl_stock_movement WHERE id_stock_movement = ".$rm['id_stock_movement']); 
+			{
+				$ro = dbQuery("DELETE FROM tbl_stock_movement WHERE id_stock_movement = ".$rm['id_stock_movement']);
 			}
 		}
-		return true;	
+		return true;
 	}else{
 		return false;
-	}	
+	}
 }
 
 public function return_movement($reference)
 {
 	$qs = dbQuery("SELECT id_stock_movement, id_product_attribute, move_in, id_zone FROM tbl_stock_movement WHERE reference = '".$reference."'");
-	return $qs;	
+	return $qs;
 }
 
 //////////////////  ยอดรวมสินค้าที่คืนที่ถูกเพิ่มเข้า order_detail_sold (ได้ยอดติดลบกลับมา)
@@ -358,6 +358,6 @@ public function get_id_budget_by_id_order($id_order)
 	}
 	return $id_budget;
 }
-	
+
 }
 ?>

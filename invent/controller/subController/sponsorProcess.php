@@ -2,14 +2,14 @@
 if( dbNumRows($qs) > 0 )
 {
 	startTransection();
-	
+
 	while( $rs = dbFetchObject($qs) )
 	{
 		set_time_limit(60);
 		$id_pa		= $rs->id_pa;
 		$qty			= $rs->qty;
 		$newQty		= $qty * (-1);
-		$dateUpd	= dbDate($order->date_add, TRUE);
+		$dateUpd	= date('Y-m-d H:i:s'); //dbDate($order->date_add, TRUE);
 		$fromZone	= $rs->id_zone;
 		$idWH			= $rs->id_warehouse;
 		$pd			= new product();

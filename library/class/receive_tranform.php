@@ -1,4 +1,4 @@
-<?php 
+<?php
 class receive_tranform
 {
 
@@ -43,7 +43,7 @@ public function save_add($id)
 				$rd = update_stock_zone($rs['qty'], $rs['id_zone'], $rs['id_product_attribute']);
 				if($rd)
 				{
-					$rm = $this->insert_movement("in", 1, $rs['id_product_attribute'],$rs['id_warehouse'], $rs['qty'], $this->reference, dbDate($this->date_add, true), $rs['id_zone']);
+					$rm = $this->insert_movement("in", 1, $rs['id_product_attribute'],$rs['id_warehouse'], $rs['qty'], $this->reference, now(), $rs['id_zone']);
 					$this->change_item_status($rs['id_receive_tranform_detail'], 1);
 					$i++;
 				}
@@ -51,7 +51,7 @@ public function save_add($id)
 		endwhile;
 	}
 	if($i == $rows){ $this->change_status($id, 1); }
-	return $i; 
+	return $i;
 }
 
 
@@ -59,7 +59,7 @@ public function add_item(array $data)
 {
 	$qs = dbQuery("SELECT qty FROM tbl_receive_tranform_detail WHERE id_receive_tranform = ".$data['id_receive_tranform']." AND id_product_attribute = ".$data['id_product_attribute']." AND id_zone = ".$data['id_zone']." AND status = 0");
 	if(dbNumRows($qs) == 1 )
-	{ 
+	{
 		return dbQuery("UPDATE tbl_receive_tranform_detail SET qty = qty + ".$data['qty']." WHERE id_receive_tranform = ".$data['id_receive_tranform']." AND id_product_attribute = ".$data['id_product_attribute']." AND id_zone = ".$data['id_zone']." AND status = 0");
 	}else{
 		return dbQuery("INSERT INTO tbl_receive_tranform_detail (id_receive_tranform, id_product, id_product_attribute, qty, id_warehouse, id_zone, id_employee, date_add) VALUES (".$data['id_receive_tranform'].", ".$data['id_product'].", ".$data['id_product_attribute'].", ".$data['qty'].", ".$data['id_warehouse'].", ".$data['id_zone'].", ".$data['id_employee'].", '".$data['date_add']."')");
@@ -73,7 +73,7 @@ public function delete_doc($id)
 	{
 		while($rs = dbFetchArray($qs) )
 		{
-			$this->delete_item($rs['id_receive_tranform_detail']);	
+			$this->delete_item($rs['id_receive_tranform_detail']);
 		}
 	}
 	return dbQuery("DELETE FROM tbl_receive_tranform WHERE id_receive_tranform = ".$id);
@@ -84,15 +84,15 @@ public function delete_item($id)
 	$rs = $this->isSaved($id);
 	if($rs)
 	{
-		$rd = $this->roll_back_action($id);	
+		$rd = $this->roll_back_action($id);
 		if($rd)
 		{
-			return dbQuery("DELETE FROM tbl_receive_tranform_detail WHERE id_receive_tranform_detail = ".$id);	
+			return dbQuery("DELETE FROM tbl_receive_tranform_detail WHERE id_receive_tranform_detail = ".$id);
 		}else{
 			return false;
 		}
 	}else{
-		return dbQuery("DELETE FROM tbl_receive_tranform_detail WHERE id_receive_tranform_detail = ".$id);	
+		return dbQuery("DELETE FROM tbl_receive_tranform_detail WHERE id_receive_tranform_detail = ".$id);
 	}
 }
 
@@ -110,7 +110,7 @@ public function roll_back_action($id)
 	{
 		if(!isset($this->reference) )
 		{
-			$this->get_data($rs['id_receive_tranform']);	
+			$this->get_data($rs['id_receive_tranform']);
 		}
 		$rd = $this->delete_movement($this->reference, $rs['id_product_attribute'], $rs['qty'], $rs['id_zone']);
 		if($rd)
@@ -119,7 +119,7 @@ public function roll_back_action($id)
 		}else{
 			return false;
 		}
-	}		
+	}
 }
 
 public function get_items($id)
@@ -156,12 +156,12 @@ public function update($id, array $data)
 
 public function change_status($id, $status)
 {
-	return dbQuery("UPDATE tbl_receive_tranform SET status = ".$status." WHERE id_receive_tranform = ".$id);	
+	return dbQuery("UPDATE tbl_receive_tranform SET status = ".$status." WHERE id_receive_tranform = ".$id);
 }
 
 public function change_item_status($id, $status)
 {
-	return dbQuery("UPDATE tbl_receive_tranform_detail SET status = ".$status." WHERE id_receive_tranform_detail = ".$id);	
+	return dbQuery("UPDATE tbl_receive_tranform_detail SET status = ".$status." WHERE id_receive_tranform_detail = ".$id);
 }
 
 public function total_qty($id)
@@ -169,7 +169,7 @@ public function total_qty($id)
 	$qty = 0;
 	$qs = dbQuery("SELECT SUM(qty) AS qty FROM tbl_receive_tranform_detail WHERE id_receive_tranform = ".$id);
 	if(dbNumRows($qs) == 1 )
-	{ 
+	{
 		list($qty)	= dbFetchArray($qs);
 	}
 	return $qty;
@@ -214,11 +214,11 @@ public function get_new_reference($date = "")
 		$ra = explode('-', $str, 2);
 		$num = $ra[1];
 		$run_num = $num + 1;
-		$reference = $prefix."-".$run_num;		
+		$reference = $prefix."-".$run_num;
 	}else{
 		$reference = $prefix."-".$year.$month."00001";
 	}
-	return $reference;		
+	return $reference;
 }
 
 }/// end class
