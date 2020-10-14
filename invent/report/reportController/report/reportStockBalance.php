@@ -9,10 +9,10 @@
 	$wh			= $whOption == 1 ? $_POST['wh'] : FALSE;
 	$date 		= $dateOption == 1 ? dbDate($_POST['date']) : date('Y-m-d');
 	$whList		= $whOption == 1 ? warehouseIn($wh) : warehouseIn($wh, TRUE);
-	
+
 	$pdQuery 	= $pdOption == 1 ? "AND product_code >= '".$pdFrom."' AND product_code <= '".$pdTo."' " : "";
 	$whQuery	= $whOption == 1 && $whList !== FALSE ? "AND id_warehouse IN(".$whList.") " : '';
-	
+
 	if( $pdOption == 0 )
 	{
 		$qr = "SELECT id_product_attribute, barcode, reference, product_name, cost FROM tbl_product_attribute ";
@@ -66,7 +66,7 @@
 				array_push($ds, $arr);
 				$total_qty += $qty;
 				$total_amount += ($qty * $rs->cost);
-				$n++;	
+				$n++;
 			}
 		}
 		$arr = array("total_qty" => number_format($total_qty), "total_amount" => number_format($total_amount, 2));
@@ -85,7 +85,7 @@
 							);
 		array_push($ds, $arr);
 		$arr = array("total_qty" => number_format($total_qty), "total_amount" => number_format($total_amount, 2));
-		array_push($ds, $arr);	
-	}	
+		array_push($ds, $arr);
+	}
 	echo json_encode($ds);
 	?>

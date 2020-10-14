@@ -2745,7 +2745,7 @@ function sold_product($id_order, $id_pa, $qty)
 	$id_sale	= get_id_sale_by_customer($id_cus);
 	$role		= $order->role;
 	$id_emp	= $order->id_employee;
-	$date_upd = dbDate($order->date_add, TRUE);
+	$date_upd = date('Y-m-d H:i:s'); //dbDate($order->date_add, TRUE);
 
 	$sc	= TRUE;
 	$ds		= get_detail_from_order($id_order, $id_pa); /// ตรวจสอบว่ามีสินค้านี้อยูทในออเดอร์หรือป่าว
